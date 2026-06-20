@@ -183,11 +183,11 @@ function validateProjectJson(value: unknown): ProjectJson {
   const candidate = value as Partial<ProjectJson>;
 
   if (!candidate || typeof candidate !== 'object') {
-    throw new Error('project.json の形式が不正です。');
+    throw new Error('案件データファイル（project.json）の形式が不正です。');
   }
 
   if (typeof candidate.schemaVersion !== 'string' || candidate.schemaVersion.length === 0) {
-    throw new Error('schemaVersion が存在しません。');
+    throw new Error('データ形式のバージョン（schemaVersion）が存在しません。');
   }
 
   if (!candidate.project || typeof candidate.project !== 'object') {
@@ -209,7 +209,7 @@ function validateFloorMapJson(value: unknown): FloorMapEntry[] {
   const candidate = value as { floorMaps?: Array<Partial<FloorMapEntry>> };
 
   if (!candidate || typeof candidate !== 'object' || !Array.isArray(candidate.floorMaps)) {
-    throw new Error('floor-map.json は floorMaps 配列を含む必要があります。');
+    throw new Error('平面図ピン情報ファイル（floor-map.json）は floorMaps 配列を含む必要があります。');
   }
 
   return normalizeFloorMaps(candidate.floorMaps);
@@ -482,8 +482,8 @@ function ProjectPackagerPage() {
     }
 
     if (getExtension(file.name) !== 'json') {
-      setMessages([`${file.name}: project.json を指定してください。`]);
-      notify('project.jsonの読み込みに失敗しました', 'error');
+      setMessages([`${file.name}: 案件データファイル（project.json）を指定してください。`]);
+      notify('案件データファイルの読み込みに失敗しました', 'error');
       return;
     }
 
@@ -539,12 +539,12 @@ function ProjectPackagerPage() {
         resultPath: parsed.qa?.resultPath ?? '',
       });
       setMessages([
-        `${file.name}: project.json を読み込みました。実画像ファイルは復元されないため、同名ファイルを再登録してください。`,
+        `${file.name}: 案件データファイル（project.json）を読み込みました。実画像ファイルは復元されないため、同名ファイルを再登録してください。`,
       ]);
-      notify('project.jsonを読み込みました', 'success');
+      notify('案件データファイルを読み込みました', 'success');
     } catch (error) {
-      setMessages([error instanceof Error ? error.message : 'project.json を読み込めません。']);
-      notify('project.jsonの読み込みに失敗しました', 'error');
+      setMessages([error instanceof Error ? error.message : '案件データファイルを読み込めません。']);
+      notify('案件データファイルの読み込みに失敗しました', 'error');
     }
   };
 
@@ -555,19 +555,19 @@ function ProjectPackagerPage() {
     }
 
     if (getExtension(file.name) !== 'json') {
-      setMessages([`${file.name}: floor-map.json を指定してください。`]);
-      notify('floor-map.jsonの読み込みに失敗しました', 'error');
+      setMessages([`${file.name}: 平面図ピン情報ファイル（floor-map.json）を指定してください。`]);
+      notify('平面図ピン情報ファイルの読み込みに失敗しました', 'error');
       return;
     }
 
     try {
       const nextFloorMaps = validateFloorMapJson(JSON.parse(await file.text()) as unknown);
       setFloorMaps(nextFloorMaps);
-      setMessages([`${file.name}: floorMaps を読み込みました。既存のfloorMapsは上書きされました。`]);
-      notify('floor-map.jsonを読み込みました', 'success');
+      setMessages([`${file.name}: 平面図ピン情報（floorMaps）を読み込みました。既存の平面図ピン情報は上書きされました。`]);
+      notify('平面図ピン情報ファイルを読み込みました', 'success');
     } catch (error) {
-      setMessages([error instanceof Error ? error.message : 'floor-map.json を読み込めません。']);
-      notify('floor-map.jsonの読み込みに失敗しました', 'error');
+      setMessages([error instanceof Error ? error.message : '平面図ピン情報ファイルを読み込めません。']);
+      notify('平面図ピン情報ファイルの読み込みに失敗しました', 'error');
     }
   };
 
@@ -624,14 +624,14 @@ function ProjectPackagerPage() {
     const warnings = [
       ...(panoramas.length === 0 ? ['パノラマ画像が0枚です。空のpanoramasフォルダを含めて出力します。'] : []),
       ...(missingPanoramas.length > 0
-        ? [`未再登録のパノラマ ${missingPanoramas.length} 件は project.json に残りますが、ZIP内に実ファイルは含まれません。`]
+        ? [`未再登録のパノラマ ${missingPanoramas.length} 件は案件データファイル（project.json）に残りますが、ZIP内に実ファイルは含まれません。`]
         : []),
       ...(missingFloorplans.length > 0
-        ? [`未再登録の平面図 ${missingFloorplans.length} 件は project.json に残りますが、ZIP内に実ファイルは含まれません。`]
+        ? [`未再登録の平面図 ${missingFloorplans.length} 件は案件データファイル（project.json）に残りますが、ZIP内に実ファイルは含まれません。`]
         : []),
       ...(!qaFile && qaResultPath ? ['QA結果JSONの実ファイルが未再登録のため、qaフォルダには含まれません。'] : []),
       ...(missingFloorMapImages.length > 0
-        ? [`floorMapsに紐づく平面図画像 ${missingFloorMapImages.length} 件の実ファイルが未登録です。ZIPに画像本体が含まれない可能性があります。`]
+        ? [`平面図ピン情報（floorMaps）に紐づく平面図画像 ${missingFloorMapImages.length} 件の実ファイルが未登録です。ZIPに画像本体が含まれない可能性があります。`]
         : []),
     ];
     const zip = new JSZip();
@@ -665,46 +665,46 @@ function ProjectPackagerPage() {
     setMessages(warnings.length > 0 ? warnings : ['ZIPを書き出しました。']);
     setIsPackaging(false);
     if (floorMaps.length === 0) {
-      notify('floorMapsは空の状態でZIPを書き出しました', 'info');
+      notify('平面図ピン情報は空の状態でZIPを書き出しました', 'info');
     } else if (missingFloorMapImages.length > 0) {
-      notify('floorMapsに不足している平面図画像があります', 'warning');
+      notify('平面図ピン情報に不足している平面図画像があります', 'warning');
     } else if (warnings.length > 0) {
       notify('未再登録ファイルがあります。ZIPには実ファイルは含まれません', 'warning');
     } else {
-      notify('floorMapsを含めてZIPを書き出しました', 'success');
+      notify('平面図ピン情報を含めてZIPを書き出しました', 'success');
     }
   };
 
   return (
-    <AppFrame toolName="Project Packager" status="v0.3">
+    <AppFrame toolName="案件パッケージ作成" status="基本機能版 v0.3">
       <section className="qaHero workspaceHero" aria-labelledby="packager-title">
         <div>
-          <p className="eyebrow">Panorama Project Packager v0.3</p>
+          <p className="eyebrow">案件パッケージ作成 v0.3</p>
           <h1 id="packager-title">案件単位のZIPパッケージ作成</h1>
           <p className="lead">
-            project.json の再読み込み、案件情報の再編集、実ファイルの再登録に対応しました。
+            案件データファイル（project.json）の再読み込み、案件情報の再編集、実ファイルの再登録に対応しました。
           </p>
         </div>
       </section>
 
-      <section className="dashboardGrid" aria-label="Project Packager Dashboard">
-        <article className="metricCard"><span>Panoramas</span><strong>{panoramas.length}</strong></article>
-        <article className="metricCard"><span>Floorplans</span><strong>{floorplans.length}</strong></article>
-        <article className="metricCard warningMetric"><span>Missing Files</span><strong>{missingPanoramas.length + missingFloorplans.length}</strong></article>
-        <article className="metricCard"><span>QA Status</span><strong>{qaSummary.total > 0 ? `${qaSummary.ok}/${qaSummary.total}` : '-'}</strong></article>
-        <article className="metricCard successMetric"><span>Metadata Complete</span><strong>{metadataComplete}/{panoramas.length}</strong></article>
-        <article className="metricCard"><span>FloorMaps</span><strong>{floorMaps.length}</strong></article>
-        <article className="metricCard"><span>Pins</span><strong>{floorMapPinCount}</strong></article>
+      <section className="dashboardGrid" aria-label="案件パッケージ作成 ダッシュボード">
+        <article className="metricCard"><span>パノラマ</span><strong>{panoramas.length}</strong></article>
+        <article className="metricCard"><span>平面図</span><strong>{floorplans.length}</strong></article>
+        <article className="metricCard warningMetric"><span>不足ファイル</span><strong>{missingPanoramas.length + missingFloorplans.length}</strong></article>
+        <article className="metricCard"><span>品質チェック</span><strong>{qaSummary.total > 0 ? `${qaSummary.ok}/${qaSummary.total}` : '-'}</strong></article>
+        <article className="metricCard successMetric"><span>場所名入力済み</span><strong>{metadataComplete}/{panoramas.length}</strong></article>
+        <article className="metricCard"><span>平面図ピン情報</span><strong>{floorMaps.length}</strong></article>
+        <article className="metricCard"><span>ピン</span><strong>{floorMapPinCount}</strong></article>
       </section>
 
       <section className="importPanel" aria-labelledby="import-title">
         <div>
-          <h2 id="import-title">project.json 読み込み</h2>
-          <p>既存パッケージの project.json を読み込むと、案件情報・一覧・QAサマリーを復元できます。</p>
-          <p>project.json だけでは実画像ファイル本体は復元できません。同名ファイルを再登録すると一覧に紐づきます。</p>
+          <h2 id="import-title">案件データファイル（project.json）読み込み</h2>
+          <p>既存パッケージの案件データファイルを読み込むと、案件情報・一覧・品質チェック結果を復元できます。</p>
+          <p>案件データファイルだけでは実画像ファイル本体は復元できません。同名ファイルを再登録すると一覧に紐づきます。</p>
         </div>
         <label className="fileUploadButton secondaryUpload">
-          📁 project.jsonを読み込む
+          📁 案件データファイルを読み込む
           <input
             type="file"
             accept=".json,application/json"
@@ -718,13 +718,13 @@ function ProjectPackagerPage() {
 
       {importedProject ? (
         <section className="importedInfo" aria-label="読み込み済みプロジェクト情報">
-          <div><span>schemaVersion</span><strong>{importedProject.schemaVersion}</strong></div>
+          <div><span>データ形式</span><strong>{importedProject.schemaVersion}</strong></div>
           <div><span>QA結果パス</span><strong>{importedProject.resultPath || '-'}</strong></div>
           <div><span>未再登録ファイル</span><strong>{missingPanoramas.length + missingFloorplans.length}</strong></div>
         </section>
       ) : null}
 
-      <section className="packagerLayout" aria-label="Project Packager 作業エリア">
+      <section className="packagerLayout" aria-label="案件パッケージ作成 作業エリア">
         <form className="projectForm">
           <h2>案件情報</h2>
           <label>
@@ -797,7 +797,7 @@ function ProjectPackagerPage() {
                 />
               </label>
               <label className="fileUploadButton secondaryUpload">
-                📁 floor-map.jsonを読み込む
+                📁 平面図ピン情報を読み込む
                 <input
                   type="file"
                   accept=".json,application/json"
@@ -820,7 +820,7 @@ function ProjectPackagerPage() {
             {(missingPanoramas.length > 0 || missingFloorplans.length > 0 || missingFloorMapImages.length > 0) ? (
               <div className="missingNotice">
                 <strong>実ファイル再登録が必要です。</strong>
-                <span>未再登録の項目は project.json / floorMaps には残りますが、ZIP内に実ファイルは含まれません。</span>
+                <span>未再登録の項目は案件データファイル / 平面図ピン情報には残りますが、ZIP内に実ファイルは含まれません。</span>
               </div>
             ) : null}
 
@@ -842,7 +842,7 @@ function ProjectPackagerPage() {
                         <div className="emptyState smallEmpty">
                           <span>📂</span>
                           <strong>パノラマ画像がありません</strong>
-                          <p>画像を追加、または project.json を読み込んでメタ情報を復元してください。</p>
+                          <p>画像を追加、または案件データファイル（project.json）を読み込んで管理情報を復元してください。</p>
                         </div>
                       </td>
                     </tr>
@@ -967,10 +967,10 @@ function ProjectPackagerPage() {
               <table className="compactTable">
                 <thead>
                   <tr>
-                    <th>FloorMap</th>
-                    <th>level</th>
+                    <th>平面図ピン情報</th>
+                    <th>階</th>
                     <th>imageFileName</th>
-                    <th>pins</th>
+                    <th>ピン数</th>
                     <th>平面図ファイル状態</th>
                   </tr>
                 </thead>
@@ -980,8 +980,8 @@ function ProjectPackagerPage() {
                       <td colSpan={5}>
                         <div className="emptyState smallEmpty">
                           <span>📍</span>
-                          <strong>floorMapsがありません</strong>
-                          <p>FloorMap Builderで平面図ピンを作成し、updated-project.json または floor-map.json を読み込んでください。</p>
+                          <strong>平面図ピン情報がありません</strong>
+                          <p>平面図ピン配置でピンを作成し、更新済み案件データまたは平面図ピン情報ファイルを読み込んでください。</p>
                         </div>
                       </td>
                     </tr>
@@ -1026,7 +1026,7 @@ function ProjectPackagerPage() {
 ├ qa/
 │  └ ${qaFile ? qaFile.name : 'qa-results.json'}
 └ floor-maps/
-   └ ${floorMaps.length > 0 ? 'floor-map.json' : '(floorMapsなしの場合は省略)'}`}</pre>
+   └ ${floorMaps.length > 0 ? 'floor-map.json' : '(平面図ピン情報なしの場合は省略)'}`}</pre>
             </div>
             <div className="qaSummaryInline">
               <h3>QAサマリー</h3>
@@ -1045,7 +1045,7 @@ function ProjectPackagerPage() {
         {form.projectName.trim().length === 0 ? <p>案件名を入力するとZIP出力できます。</p> : null}
         {panoramas.length === 0 ? <p>警告: パノラマ画像が0枚です。必要に応じて追加してください。</p> : null}
         {(missingPanoramas.length > 0 || missingFloorplans.length > 0) ? <p>警告: 未再登録ファイルはZIPに含まれません。</p> : null}
-        {missingFloorMapImages.length > 0 ? <p>警告: floorMapsに紐づく平面図画像の実ファイルが未登録です。</p> : null}
+        {missingFloorMapImages.length > 0 ? <p>警告: 平面図ピン情報に紐づく平面図画像の実ファイルが未登録です。</p> : null}
         <button type="button" onClick={() => void exportZip()} disabled={!canExport}>
           {isPackaging ? '📦 ZIP生成中' : '📦 ZIP出力'}
         </button>

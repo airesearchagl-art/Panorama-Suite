@@ -102,7 +102,7 @@ function downloadJson(fileName: string, data: unknown) {
 function validateProjectJson(value: unknown): SourceProject {
   const candidate = value as RawProject;
   if (!candidate || typeof candidate !== 'object') {
-    throw new Error('project.json の形式が正しくありません。');
+    throw new Error('案件データファイル（project.json）の形式が正しくありません。');
   }
   if (!candidate.project || typeof candidate.project !== 'object') {
     throw new Error('project が存在しません。');
@@ -223,8 +223,8 @@ function FloorMapBuilderPage() {
       return;
     }
     if (getExtension(file.name) !== 'json') {
-      setMessages([`${file.name}: project.json を指定してください。`]);
-      notify('project.jsonの読み込みに失敗しました', 'error');
+      setMessages([`${file.name}: 案件データファイル（project.json）を指定してください。`]);
+      notify('案件データファイルの読み込みに失敗しました', 'error');
       return;
     }
 
@@ -233,12 +233,12 @@ function FloorMapBuilderPage() {
       setSourceProject(parsed);
       setPins((current) => (current.length > 0 ? current : parsed.floorMaps[0]?.pins ?? []));
       setSelectedPanoramaId(parsed.panoramas[0]?.id ?? '');
-      setMessages([`${file.name}: project.json を読み込みました。`]);
-      notify('project.jsonを読み込みました', 'success');
+      setMessages([`${file.name}: 案件データファイル（project.json）を読み込みました。`]);
+      notify('案件データファイルを読み込みました', 'success');
     } catch (error) {
       setSourceProject(null);
-      setMessages([error instanceof Error ? error.message : 'project.json を読み込めません。']);
-      notify('project.jsonの読み込みに失敗しました', 'error');
+      setMessages([error instanceof Error ? error.message : '案件データファイルを読み込めません。']);
+      notify('案件データファイルの読み込みに失敗しました', 'error');
     }
   };
 
@@ -291,7 +291,7 @@ function FloorMapBuilderPage() {
       notify('未割当パノラマがあります', 'warning');
     }
     downloadJson('floor-map.json', { floorMaps: buildFloorMaps() });
-    notify('floor-map.jsonを書き出しました', 'success');
+    notify('平面図ピン情報ファイルを書き出しました', 'success');
   };
 
   const exportUpdatedProjectJson = () => {
@@ -299,37 +299,37 @@ function FloorMapBuilderPage() {
       notify('未割当パノラマがあります', 'warning');
     }
     downloadJson('updated-project.json', buildUpdatedProject());
-    notify('updated-project.jsonを書き出しました', 'success');
+    notify('更新済み案件データを書き出しました', 'success');
   };
 
   return (
-    <AppFrame toolName="FloorMap Builder" status="MVP">
+    <AppFrame toolName="平面図ピン配置" status="基本機能版">
       <section className="qaHero workspaceHero" aria-labelledby="floormap-title">
         <div>
-          <p className="eyebrow">FloorMap Builder MVP</p>
+          <p className="eyebrow">平面図ピン配置 基本機能版</p>
           <h1 id="floormap-title">平面図ピン配置</h1>
           <p className="lead">
-            平面図画像の上に360°パノラマの撮影位置を配置し、x / y の%座標と方位を floorMaps として保存します。
+            平面図画像の上に360°パノラマの撮影位置を配置し、平面図ピン情報（floorMaps）として保存します。
           </p>
         </div>
         <div className="qaActions">
           <button type="button" className="button buttonPrimary" onClick={exportFloorMapJson} disabled={activeFloorMaps.length === 0}>
-            floor-map.json
+            平面図ピン情報
           </button>
           <button type="button" className="button buttonPrimary" onClick={exportUpdatedProjectJson} disabled={!sourceProject}>
-            updated-project.json
+            更新済み案件データ
           </button>
         </div>
       </section>
 
-      <section className="dashboardGrid" aria-label="FloorMap Builder Dashboard">
-        <article className="metricCard"><span>FloorMaps</span><strong>{activeFloorMaps.length}</strong></article>
-        <article className="metricCard"><span>Panoramas</span><strong>{panoramas.length}</strong></article>
-        <article className="metricCard successMetric"><span>Pins</span><strong>{pins.length}</strong></article>
-        <article className="metricCard warningMetric"><span>Unassigned</span><strong>{unassignedCount}</strong></article>
+      <section className="dashboardGrid" aria-label="平面図ピン配置 ダッシュボード">
+        <article className="metricCard"><span>平面図</span><strong>{activeFloorMaps.length}</strong></article>
+        <article className="metricCard"><span>パノラマ</span><strong>{panoramas.length}</strong></article>
+        <article className="metricCard successMetric"><span>ピン</span><strong>{pins.length}</strong></article>
+        <article className="metricCard warningMetric"><span>未割当</span><strong>{unassignedCount}</strong></article>
       </section>
 
-      <section className="floorMapLayout" aria-label="FloorMap Builder Workspace">
+      <section className="floorMapLayout" aria-label="平面図ピン配置 作業エリア">
         <aside className="floorMapControlPanel">
           <h2>読み込み</h2>
           <label className="fileUploadButton">
@@ -344,7 +344,7 @@ function FloorMapBuilderPage() {
             />
           </label>
           <label className="fileUploadButton secondaryUpload">
-            project.jsonを読み込む
+            案件データファイルを読み込む
             <input
               type="file"
               accept=".json,application/json"
@@ -362,8 +362,8 @@ function FloorMapBuilderPage() {
           {!sourceProject ? (
             <div className="emptyState smallEmpty">
               <span>📄</span>
-              <strong>project.jsonが未読込です</strong>
-              <p>Packagerで出力したproject.jsonを読み込んでください。</p>
+              <strong>案件データファイルが未読込です</strong>
+              <p>案件パッケージ作成で出力した project.json を読み込んでください。</p>
             </div>
           ) : null}
           {!floorMap ? (
@@ -421,7 +421,7 @@ function FloorMapBuilderPage() {
               <div className="emptyState smallEmpty">
                 <span>📷</span>
                 <strong>パノラマがありません</strong>
-                <p>project.jsonを読み込んでください。</p>
+                <p>案件データファイル（project.json）を読み込んでください。</p>
               </div>
             ) : (
               <div className="panoramaPickList">

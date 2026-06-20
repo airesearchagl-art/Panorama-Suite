@@ -344,10 +344,10 @@ function PanoramaConverterPage() {
   };
 
   return (
-    <AppFrame toolName="Panorama Converter" status="MVP公開中">
+    <AppFrame toolName="パノラマ画像変換" status="基本機能版">
       <section className="qaHero workspaceHero" aria-labelledby="converter-title">
         <div>
-          <p className="eyebrow">Panorama Converter MVP</p>
+          <p className="eyebrow">パノラマ画像変換 基本機能版</p>
           <h1 id="converter-title">パノラマ画像の一括変換</h1>
           <p className="lead">
             jpg、jpeg、png、webp をブラウザ内のCanvasで変換します。画質調整、リサイズ、2:1比率維持、一括ZIP出力に対応します。
@@ -366,14 +366,14 @@ function PanoramaConverterPage() {
         </div>
       </section>
 
-      <section className="dashboardGrid" aria-label="Panorama Converter Dashboard">
-        <article className="metricCard"><span>Input Images</span><strong>{images.length}</strong></article>
-        <article className="metricCard successMetric"><span>Converted</span><strong>{convertedImages.length}</strong></article>
-        <article className="metricCard errorMetric"><span>Failed</span><strong>{failedImages.length}</strong></article>
-        <article className="metricCard"><span>Output Format</span><strong>{settings.outputFormat}</strong></article>
+      <section className="dashboardGrid" aria-label="パノラマ画像変換 ダッシュボード">
+        <article className="metricCard"><span>入力画像</span><strong>{images.length}</strong></article>
+        <article className="metricCard successMetric"><span>変換済み</span><strong>{convertedImages.length}</strong></article>
+        <article className="metricCard errorMetric"><span>失敗</span><strong>{failedImages.length}</strong></article>
+        <article className="metricCard"><span>出力形式</span><strong>{settings.outputFormat}</strong></article>
       </section>
 
-      <section className="converterLayout" aria-label="Panorama Converter 作業エリア">
+      <section className="converterLayout" aria-label="パノラマ画像変換 作業エリア">
         <aside className="converterSettings">
           <h2>変換設定</h2>
           <label>

@@ -22,7 +22,9 @@ const statusTone: Record<ToolAvailability, string> = {
 
 function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }) {
   const { notify } = useToast();
-  const disabledReason = tool.availability === 'development' ? 'このツールは現在開発中です。' : 'このツールは現在準備中です。';
+  const disabledReason = tool.availability === 'development'
+    ? 'このツールは現在開発中です。'
+    : 'このツールは現在準備中です。今後の更新で追加予定です。';
 
   const handleDisabledClick = () => {
     notify(disabledReason, tool.availability === 'development' ? 'warning' : 'info');
@@ -38,7 +40,8 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
       <div className="cardHeader">
         <div>
           <p className="categoryLabel">{tool.category}</p>
-          <h3>{tool.name}</h3>
+          <h3>{tool.displayName}</h3>
+          {tool.displayName !== tool.name ? <small className="toolEnglishName">{tool.name}</small> : null}
         </div>
         <span className={`statusBadge ${statusTone[tool.availability]}`}>{tool.statusLabel}</span>
       </div>
@@ -66,7 +69,7 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
           </a>
         ) : (
           <button type="button" className="toolLink toolLinkDisabled" disabled onClick={handleDisabledClick} tabIndex={-1}>
-            {tool.availability === 'development' ? '開発中' : 'Coming Soon'}
+            {tool.availability === 'development' ? '開発中' : '準備中'}
           </button>
         )}
       </div>
@@ -88,7 +91,7 @@ function PortalPage() {
     return tools.filter((tool) => {
       const matchesKeyword =
         normalizedKeyword.length === 0 ||
-        [tool.name, tool.description, tool.category, tool.statusLabel, tool.availability]
+        [tool.name, tool.displayName, tool.description, tool.category, tool.statusLabel, tool.availability]
           .join(' ')
           .toLowerCase()
           .includes(normalizedKeyword);
@@ -114,17 +117,17 @@ function PortalPage() {
           <p className="lead">360°パノラマ業務を、品質確認、変換、案件管理、共有、レビューへつなぐ作業空間です。</p>
         </div>
         <div className="securityPanel">
-          <strong>🔒 Local Processing</strong>
-          <span>画像処理はブラウザ内で完結。外部API送信、クラウドアップロードは行いません。</span>
+          <strong>🔒 ローカル処理</strong>
+          <span>画像や案件データはブラウザ内で処理します。外部API送信、クラウドアップロードは行いません。</span>
         </div>
       </section>
 
       <section className="dashboardGrid" aria-label="Portal Dashboard">
-        <article className="metricCard"><span>Tools</span><strong>{tools.length}</strong></article>
-        <article className="metricCard successMetric"><span>Available</span><strong>{availableCount}</strong></article>
-        <article className="metricCard"><span>MVP</span><strong>{mvpCount}</strong></article>
-        <article className="metricCard warningMetric"><span>Roadmap</span><strong>{roadmapCount}</strong></article>
-        <article className="metricCard"><span>Filtered</span><strong>{filteredTools.length}</strong></article>
+        <article className="metricCard"><span>ツール数</span><strong>{tools.length}</strong></article>
+        <article className="metricCard successMetric"><span>利用可能</span><strong>{availableCount}</strong></article>
+        <article className="metricCard"><span>基本機能版</span><strong>{mvpCount}</strong></article>
+        <article className="metricCard warningMetric"><span>今後追加予定</span><strong>{roadmapCount}</strong></article>
+        <article className="metricCard"><span>表示中</span><strong>{filteredTools.length}</strong></article>
       </section>
 
       <section className="sectionBlock" aria-labelledby="categories-title">
@@ -141,7 +144,7 @@ function PortalPage() {
             <input
               value={keyword}
               onChange={(event) => setKeyword(event.target.value)}
-              placeholder="tool name / category / status"
+              placeholder="ツール名 / カテゴリ / 状態"
               type="search"
             />
           </label>
@@ -171,8 +174,8 @@ function PortalPage() {
           </button>
           <div className="filterState" aria-live="polite">
             <strong>表示中: {filteredTools.length} / {tools.length} tools</strong>
-            <span>Category: {categoryFilter}</span>
-            <span>Status: {availabilityFilter === 'All' ? 'All' : availabilityLabels[availabilityFilter]}</span>
+            <span>カテゴリ: {categoryFilter}</span>
+            <span>状態: {availabilityFilter === 'All' ? 'All' : availabilityLabels[availabilityFilter]}</span>
           </div>
         </div>
         <div className="categoryStack">
@@ -185,7 +188,7 @@ function PortalPage() {
               <section className="categoryBand" key={category} aria-labelledby={`${category}-title`}>
                 <div className="categoryTitle">
                   <h3 id={`${category}-title`}>{category}</h3>
-                  <span>{categoryTools.length} tools</span>
+                  <span>{categoryTools.length} 件</span>
                 </div>
                 <div className="toolGrid">
                   {categoryTools.map((tool) => (
@@ -224,8 +227,8 @@ function PortalPage() {
         </article>
         <article className="infoPanel">
           <p className="sectionKicker">Security</p>
-          <h2>Local Processing</h2>
-          <p>画像処理、ZIP生成、QA判定はブラウザ内で完結します。</p>
+          <h2>ローカル処理</h2>
+          <p>画像処理、ZIP生成、品質判定はブラウザ内で完結します。</p>
         </article>
       </section>
     </AppFrame>

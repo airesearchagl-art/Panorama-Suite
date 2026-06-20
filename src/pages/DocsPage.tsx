@@ -18,7 +18,7 @@ function DocsPage() {
 
       <section className="dashboardGrid">
         <article className="metricCard"><span>Version</span><strong>v0.1.0</strong></article>
-        <article className="metricCard"><span>MVP Tools</span><strong>4</strong></article>
+        <article className="metricCard"><span>基本機能版</span><strong>4</strong></article>
         <article className="metricCard successMetric"><span>Processing</span><strong>Local</strong></article>
         <article className="metricCard"><span>Release</span><strong>Vercel</strong></article>
       </section>
@@ -35,10 +35,10 @@ function DocsPage() {
           <h2>公開URL</h2>
           <ul className="docList">
             <li>Portal: <a href={publicUrls.portal}>{publicUrls.portal}</a></li>
-            <li>Panorama QA: <a href={publicUrls.qa}>{publicUrls.qa}</a></li>
-            <li>Project Packager: <a href={publicUrls.packager}>{publicUrls.packager}</a></li>
-            <li>Panorama Converter: <a href={publicUrls.converter}>{publicUrls.converter}</a></li>
-            <li>FloorMap Builder: <a href={publicUrls.floormap}>{publicUrls.floormap}</a></li>
+            <li>パノラマ品質チェック: <a href={publicUrls.qa}>{publicUrls.qa}</a></li>
+            <li>案件パッケージ作成: <a href={publicUrls.packager}>{publicUrls.packager}</a></li>
+            <li>パノラマ画像変換: <a href={publicUrls.converter}>{publicUrls.converter}</a></li>
+            <li>平面図ピン配置: <a href={publicUrls.floormap}>{publicUrls.floormap}</a></li>
           </ul>
         </article>
 
@@ -47,10 +47,10 @@ function DocsPage() {
           <h2>実装済みツール</h2>
           <ul className="docList">
             <li>Portal: ツール群とステータスを俯瞰する入口。</li>
-            <li>Panorama QA: 解像度、2:1比率、命名規則を検査。</li>
-            <li>Project Packager: 画像、平面図、QA結果、scene別メタ情報をZIP化。</li>
-            <li>Panorama Converter: 形式変換、画質調整、リサイズ、ZIP出力。</li>
-            <li>FloorMap Builder: 平面図上にパノラマsceneの撮影位置ピンを配置。</li>
+            <li>パノラマ品質チェック: 画像のサイズ、比率、名前を確認します。</li>
+            <li>案件パッケージ作成: 画像、平面図、管理情報をZIPにまとめます。</li>
+            <li>パノラマ画像変換: 画像形式、画質、サイズを変換します。</li>
+            <li>平面図ピン配置: 平面図上にパノラマ撮影位置を配置します。</li>
           </ul>
         </article>
 
@@ -58,10 +58,10 @@ function DocsPage() {
           <p className="sectionKicker">Availability</p>
           <h2>ツールカードの状態表示</h2>
           <ul className="docList">
-            <li>MVP公開中: 内部ツールとして利用可能な初期公開版です。</li>
+            <li>基本機能版: 主要な機能を使える初期版です。</li>
             <li>外部公開中: 別URLで公開されている既存ツールです。`↗` 付きで新規タブを開きます。</li>
             <li>開発中: 実装中のためクリックできません。</li>
-            <li>構想中 / 将来予定: ロードマップ対象です。Coming Soonとして表示します。</li>
+            <li>構想中 / 将来予定: 今後追加予定のツールです。準備中として表示します。</li>
           </ul>
         </article>
 
@@ -69,16 +69,16 @@ function DocsPage() {
           <p className="sectionKicker">Portal Filter</p>
           <h2>検索・絞り込み</h2>
           <ul className="docList">
-            <li>キーワード検索はツール名、説明、カテゴリ、状態ラベル、availabilityを対象にします。</li>
+            <li>キーワード検索はツール名、説明、カテゴリ、状態ラベルを対象にします。</li>
             <li>カテゴリは Export / Convert / QA / Manage / Review / Share / VR / Documentation で絞り込めます。</li>
-            <li>状態は Available / MVP / External / Development / Concept / Future で絞り込めます。</li>
+            <li>状態は 利用可能 / 基本機能版 / 外部ツール / 開発中 / 構想中 / 将来予定 で絞り込めます。</li>
             <li>カテゴリと状態は同時に指定できます。0件の場合はEmpty Stateを表示します。</li>
           </ul>
         </article>
 
         <article className="infoPanel">
           <p className="sectionKicker">Notification</p>
-          <h2>Toast通知</h2>
+          <h2>通知</h2>
           <ul className="docList">
             <li>success: 読み込み、変換、ZIP出力、ダウンロードなどが完了した状態です。</li>
             <li>warning: 非対応形式、不足ファイル、未実装ツールなど注意が必要な状態です。</li>
@@ -89,40 +89,40 @@ function DocsPage() {
 
         <article className="infoPanel">
           <p className="sectionKicker">Packager Guide</p>
-          <h2>scene別メタ情報編集</h2>
+          <h2>シーンごとの管理情報編集</h2>
           <ol className="docList">
             <li>パノラマ画像を登録する。</li>
             <li>各sceneに階、場所名、方位、シーン種別、コメント、表示順を設定する。</li>
-            <li>Panorama QAで出力したQA結果JSONを読み込む。</li>
-            <li>project.json付きZIPを出力する。</li>
-            <li>後からproject.jsonを読み込んで再編集する。</li>
+            <li>パノラマ品質チェックで出力した結果JSONを読み込む。</li>
+            <li>案件データファイル（project.json）付きZIPを書き出す。</li>
+            <li>後から案件データファイルを読み込んで再編集する。</li>
           </ol>
         </article>
 
         <article className="infoPanel">
-          <p className="sectionKicker">FloorMap Builder Guide</p>
+          <p className="sectionKicker">平面図ピン配置ガイド</p>
           <h2>平面図ピン配置</h2>
           <ol className="docList">
             <li>平面図画像を読み込む。</li>
-            <li>Project Packagerで出力したproject.jsonを読み込む。</li>
+            <li>案件パッケージ作成で出力した案件データファイル（project.json）を読み込む。</li>
             <li>配置するパノラマを選ぶ。</li>
             <li>平面図をクリックしてピンを置く。</li>
             <li>x / y %座標、方位、ラベル、コメントを調整する。</li>
-            <li>floor-map.jsonを書き出す。</li>
-            <li>updated-project.jsonを書き出す。</li>
+            <li>平面図ピン情報ファイル（floor-map.json）を書き出す。</li>
+            <li>更新済み案件データ（updated-project.json）を書き出す。</li>
           </ol>
         </article>
 
         <article className="infoPanel">
           <p className="sectionKicker">Packager v0.3</p>
-          <h2>floorMapsをZIPに同梱する</h2>
+          <h2>平面図ピン情報をZIPに同梱する</h2>
           <ol className="docList">
-            <li>FloorMap Builderで `updated-project.json` を書き出す。</li>
-            <li>Packagerの project.json 読み込みから `updated-project.json` を読み込む。</li>
-            <li>`floor-map.json` だけを反映したい場合は、Packagerの `floor-map.jsonを読み込む` から読み込む。</li>
-            <li>floorMaps一覧で平面図名、階、ピン数、平面図ファイル状態を確認する。</li>
+            <li>平面図ピン配置で更新済み案件データ（updated-project.json）を書き出す。</li>
+            <li>案件パッケージ作成の案件データファイル読み込みから、更新済み案件データを読み込む。</li>
+            <li>平面図ピン情報ファイル（floor-map.json）だけを反映したい場合は、専用の読み込みボタンを使う。</li>
+            <li>平面図ピン情報一覧で平面図名、階、ピン数、平面図ファイル状態を確認する。</li>
             <li>不足平面図画像がある場合は、同名の平面図実ファイルを再登録する。</li>
-            <li>ZIP出力すると `project.json` と `floor-maps/floor-map.json` にfloorMapsが保存される。</li>
+            <li>ZIP出力すると案件データファイルと `floor-maps/floor-map.json` に平面図ピン情報が保存される。</li>
           </ol>
         </article>
 
@@ -139,27 +139,27 @@ function DocsPage() {
           <p className="sectionKicker">Workflow</p>
           <h2>基本的な利用フロー</h2>
           <ol className="docList">
-            <li>Converterで形式と解像度を整える。</li>
+            <li>パノラマ画像変換で形式と解像度を整える。</li>
             <li>QAで初期品質を確認する。</li>
-            <li>Packagerで案件情報、scene別メタ情報、画像、QA結果をZIP化する。</li>
-            <li>FloorMap Builderで平面図に撮影位置ピンを配置する。</li>
+            <li>案件パッケージ作成で案件情報、シーンごとの管理情報、画像、品質チェック結果をZIP化する。</li>
+            <li>平面図ピン配置で平面図に撮影位置ピンを配置する。</li>
             <li>レビュー・共有・アーカイブへ展開する。</li>
           </ol>
         </article>
 
         <article className="infoPanel">
           <p className="sectionKicker">Security</p>
-          <h2>Local Processing</h2>
+          <h2>ローカル処理</h2>
           <p>画像処理、QA判定、ZIP生成はブラウザ内で完結します。外部API送信やクラウドアップロードは行いません。</p>
         </article>
 
         <article className="infoPanel">
-          <p className="sectionKicker">Roadmap</p>
+          <p className="sectionKicker">今後の予定</p>
           <h2>今後のロードマップ</h2>
           <ul className="docList">
             <li>DocumentationとHelpの拡張。</li>
-            <li>Packagerのscene別メタ情報編集。</li>
-            <li>FloorMap BuilderとPackagerの直接連携。</li>
+            <li>案件パッケージ作成のシーンごとの管理情報編集。</li>
+            <li>平面図ピン配置と案件パッケージ作成の直接連携。</li>
             <li>QA、Converter、Packagerの直接連携。</li>
           </ul>
         </article>

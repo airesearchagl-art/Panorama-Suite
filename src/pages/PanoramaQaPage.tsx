@@ -226,10 +226,10 @@ function PanoramaQaPage() {
   const passRate = summary.total > 0 ? Math.round((summary.OK / summary.total) * 100) : 0;
 
   return (
-    <AppFrame toolName="Panorama QA" status="MVP">
+    <AppFrame toolName="パノラマ品質チェック" status="基本機能版">
       <section className="qaHero workspaceHero" aria-labelledby="qa-title">
         <div>
-          <p className="eyebrow">Panorama QA v0.1</p>
+          <p className="eyebrow">パノラマ品質チェック v0.1</p>
           <h1 id="qa-title">360°パノラマ初期品質チェック</h1>
           <p className="lead">
             jpg、jpeg、png、webp のパノラマ画像をブラウザ内で検査します。外部APIへ画像は送信しません。
@@ -248,14 +248,14 @@ function PanoramaQaPage() {
         </div>
       </section>
 
-      <section className="dashboardGrid" aria-label="Panorama QA Dashboard">
-        <article className="metricCard"><span>Images</span><strong>{summary.total}</strong></article>
-        <article className="metricCard warningMetric"><span>Warnings</span><strong>{summary.Warning}</strong></article>
-        <article className="metricCard errorMetric"><span>Errors</span><strong>{summary.Error}</strong></article>
-        <article className="metricCard successMetric"><span>Pass Rate</span><strong>{passRate}%</strong></article>
+      <section className="dashboardGrid" aria-label="パノラマ品質チェック ダッシュボード">
+        <article className="metricCard"><span>画像数</span><strong>{summary.total}</strong></article>
+        <article className="metricCard warningMetric"><span>注意</span><strong>{summary.Warning}</strong></article>
+        <article className="metricCard errorMetric"><span>エラー</span><strong>{summary.Error}</strong></article>
+        <article className="metricCard successMetric"><span>合格率</span><strong>{passRate}%</strong></article>
       </section>
 
-      <section className="qaLayout" aria-label="Panorama QA 作業エリア">
+      <section className="qaLayout" aria-label="パノラマ品質チェック 作業エリア">
         <aside className="qaSummary dashboardRail" aria-label="集計">
           <div>
             <span>読み込み画像数</span>
