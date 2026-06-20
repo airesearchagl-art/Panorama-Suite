@@ -1,6 +1,9 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import AppFrame from './components/AppFrame';
 import { categories, tools, type Tool, type ToolStatus } from './data/tools';
+import DesignSystemPage from './pages/DesignSystemPage';
+import DocsPage from './pages/DocsPage';
+import HelpPage from './pages/HelpPage';
 import PanoramaConverterPage from './pages/PanoramaConverterPage';
 import PanoramaQaPage from './pages/PanoramaQaPage';
 import ProjectPackagerPage from './pages/ProjectPackagerPage';
@@ -131,6 +134,9 @@ function App() {
       <Route path="/qa" element={<PanoramaQaPage />} />
       <Route path="/packager" element={<ProjectPackagerPage />} />
       <Route path="/converter" element={<PanoramaConverterPage />} />
+      <Route path="/docs" element={<DocsPage />} />
+      <Route path="/help" element={<HelpPage />} />
+      <Route path="/docs/design-system" element={<DesignSystemPage />} />
     </Routes>
   );
 }

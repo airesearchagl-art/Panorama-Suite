@@ -10,14 +10,6 @@ type AppFrameProps = {
 };
 
 function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: AppFrameProps) {
-  const showManual = () => {
-    window.alert('Manual は README / Documentation への導線として整備予定です。');
-  };
-
-  const showHelp = () => {
-    window.alert('Help は今後、各ツールの操作ガイドとして実装予定です。画像処理はすべてブラウザ内で完結します。');
-  };
-
   return (
     <div className="suiteFrame">
       <header className="suiteHeader">
@@ -35,12 +27,12 @@ function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: A
           <span className="localPill">🔒 Local Processing</span>
         </div>
         <div className="suiteToolbar" aria-label="ツールバー">
-          <button type="button" className="button buttonSecondary" onClick={showManual}>
+          <Link to="/docs" className="button buttonSecondary">
             📖 Manual
-          </button>
-          <button type="button" className="button buttonSecondary" onClick={showHelp}>
+          </Link>
+          <Link to="/help" className="button buttonSecondary">
             ❔ Help
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -54,8 +46,9 @@ function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: A
             <NavLink to="/packager">Project Packager</NavLink>
             <NavLink to="/converter">Panorama Converter</NavLink>
             <span className="sideLabel">Guide</span>
-            <a href="#security">Security</a>
-            <a href="#documentation">Documentation</a>
+            <NavLink to="/docs">Documentation</NavLink>
+            <NavLink to="/help">Help</NavLink>
+            <NavLink to="/docs/design-system">Design System</NavLink>
           </nav>
           {sidebar ? <div className="sidePanel">{sidebar}</div> : null}
         </aside>
