@@ -1,6 +1,7 @@
-import { useMemo, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
+import { projectHandoffStorageKey } from '../data/handoff';
 
 type ProjectInfo = Record<string, unknown>;
 
@@ -48,6 +49,8 @@ type SourceProject = {
   floorplans: FloorplanInfo[];
   qa?: unknown;
   floorMaps: FloorMap[];
+  handoffCreatedAt?: string;
+  handoffSource?: string;
 };
 
 type UploadedFloorMap = {
@@ -66,6 +69,8 @@ type RawProject = {
   floorplans?: Array<Partial<FloorplanInfo>>;
   qa?: unknown;
   floorMaps?: Array<Partial<FloorMap>>;
+  createdAt?: string;
+  source?: string;
 };
 
 const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'webp']);
@@ -165,17 +170,21 @@ function createFloorMapFromUpload(file: File, previewUrl: string): UploadedFloor
 
 function FloorMapBuilderPage() {
   const { notify } = useToast();
+  const handoffLoadedRef = useRef(false);
   const [sourceProject, setSourceProject] = useState<SourceProject | null>(null);
   const [floorMap, setFloorMap] = useState<UploadedFloorMap | null>(null);
   const [pins, setPins] = useState<FloorMapPin[]>([]);
   const [selectedPanoramaId, setSelectedPanoramaId] = useState('');
   const [messages, setMessages] = useState<string[]>([]);
+  const [handoffMessage, setHandoffMessage] = useState('');
 
   const panoramas = sourceProject?.panoramas ?? [];
   const assignedPanoramaIds = pins.map((pin) => pin.panoramaId).filter(Boolean);
   const duplicateAssignments = assignedPanoramaIds.filter((id, index) => assignedPanoramaIds.indexOf(id) !== index);
   const unassignedCount = panoramas.filter((panorama) => !pins.some((pin) => pin.panoramaId === panorama.id)).length;
   const hasMissingAssignments = unassignedCount > 0 && panoramas.length > 0;
+  const handoffFloorMapCount = sourceProject?.floorMaps.length ?? 0;
+  const handoffSourceLabel = sourceProject?.handoffSource === 'packager' ? '案件パッケージ作成' : sourceProject?.handoffSource ?? '';
 
   const selectedPanorama = panoramas.find((panorama) => panorama.id === selectedPanoramaId);
   const activeFloorMaps = useMemo<FloorMap[]>(() => {
@@ -197,6 +206,38 @@ function FloorMapBuilderPage() {
 
     return [currentMap, ...restoredMaps.filter((map) => map.id !== currentMap.id)];
   }, [floorMap, pins, sourceProject?.floorMaps]);
+
+  useEffect(() => {
+    if (handoffLoadedRef.current) {
+      return;
+    }
+
+    handoffLoadedRef.current = true;
+    const raw = sessionStorage.getItem(projectHandoffStorageKey);
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as RawProject;
+      const project = validateProjectJson(parsed);
+      const restoredProject: SourceProject = {
+        ...project,
+        handoffCreatedAt: typeof parsed.createdAt === 'string' ? parsed.createdAt : '',
+        handoffSource: typeof parsed.source === 'string' ? parsed.source : 'packager',
+      };
+
+      setSourceProject(restoredProject);
+      setPins(project.floorMaps[0]?.pins ?? []);
+      setSelectedPanoramaId(project.panoramas[0]?.id ?? '');
+      setMessages(['案件パッケージ作成から受け取ったデータです。']);
+      setHandoffMessage('案件パッケージ作成から受け取ったデータです。');
+      notify('案件データを読み込みました', 'success');
+    } catch (error) {
+      setMessages([error instanceof Error ? error.message : '受け渡しデータを読み込めませんでした。']);
+      notify('受け渡しデータを読み込めませんでした', 'error');
+    }
+  }, [notify]);
 
   const handleFloorMapUpload = (fileList: FileList | null) => {
     const file = fileList?.[0];
@@ -233,6 +274,7 @@ function FloorMapBuilderPage() {
       setSourceProject(parsed);
       setPins((current) => (current.length > 0 ? current : parsed.floorMaps[0]?.pins ?? []));
       setSelectedPanoramaId(parsed.panoramas[0]?.id ?? '');
+      setHandoffMessage('');
       setMessages([`${file.name}: 案件データファイル（project.json）を読み込みました。`]);
       notify('案件データファイルを読み込みました', 'success');
     } catch (error) {
@@ -286,6 +328,19 @@ function FloorMapBuilderPage() {
     floorMaps: buildFloorMaps(),
   });
 
+  const clearHandoffData = () => {
+    sessionStorage.removeItem(projectHandoffStorageKey);
+    setHandoffMessage('');
+    if (sourceProject?.handoffSource || sourceProject?.handoffCreatedAt) {
+      setSourceProject({
+        ...sourceProject,
+        handoffCreatedAt: '',
+        handoffSource: '',
+      });
+    }
+    notify('受け渡しデータをクリアしました', 'success');
+  };
+
   const exportFloorMapJson = () => {
     if (hasMissingAssignments) {
       notify('未割当パノラマがあります', 'warning');
@@ -331,6 +386,27 @@ function FloorMapBuilderPage() {
         <article className="metricCard successMetric"><span>ピン</span><strong>{pins.length}</strong></article>
         <article className="metricCard warningMetric"><span>未割当</span><strong>{unassignedCount}</strong></article>
       </section>
+
+      {handoffMessage && sourceProject ? (
+        <section className="handoffPanel" aria-label="受け渡し案件データ">
+          <div>
+            <p className="sectionKicker">受け渡しデータ</p>
+            <h2>{handoffMessage}</h2>
+            <p>画像ファイル本体は受け渡し対象外です。必要に応じて平面図画像を再登録してください。</p>
+          </div>
+          <div className="handoffSummary">
+            <div><span>案件名</span><strong>{String(sourceProject.project.projectName ?? '-') || '-'}</strong></div>
+            <div><span>施主名</span><strong>{String(sourceProject.project.clientName ?? '-') || '-'}</strong></div>
+            <div><span>パノラマ数</span><strong>{panoramas.length}</strong></div>
+            <div><span>平面図数</span><strong>{sourceProject.floorplans.length}</strong></div>
+            <div><span>平面図ピン情報数</span><strong>{handoffFloorMapCount}</strong></div>
+            <div><span>データ元</span><strong>{handoffSourceLabel || '案件パッケージ作成'}</strong></div>
+          </div>
+          <button type="button" className="button buttonSecondary" onClick={clearHandoffData}>
+            受け渡しデータをクリア
+          </button>
+        </section>
+      ) : null}
 
       <section className="floorMapLayout" aria-label="平面図ピン配置 作業エリア">
         <aside className="floorMapControlPanel">

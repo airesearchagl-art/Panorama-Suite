@@ -1397,6 +1397,59 @@ h1 {
   color: var(--color-text-muted);
 }
 
+.handoffPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 1.2fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin-top: 18px;
+  border: 1px solid rgba(79, 124, 255, 0.45);
+  border-radius: var(--radius-card);
+  background: rgba(79, 124, 255, 0.1);
+  padding: 18px;
+}
+
+.handoffPanel h2,
+.handoffPanel p {
+  margin: 0;
+}
+
+.handoffPanel h2 {
+  margin-top: 4px;
+  font-size: 1.1rem;
+}
+
+.handoffPanel p {
+  margin-top: 6px;
+  color: var(--color-text-muted);
+}
+
+.handoffSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.handoffSummary div {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.35);
+  padding: 10px;
+}
+
+.handoffSummary span {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.handoffSummary strong {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
 .importPanel,
 .importedInfo,
 .missingNotice {
@@ -1957,6 +2010,14 @@ h1 {
   }
 
   .nextActionPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .handoffPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .handoffSummary {
     grid-template-columns: 1fr;
   }
 

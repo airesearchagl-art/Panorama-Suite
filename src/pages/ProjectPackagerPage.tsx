@@ -1,8 +1,9 @@
 import JSZip from 'jszip';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
+import { projectHandoffStorageKey } from '../data/handoff';
 
 type ProjectForm = {
   projectName: string;
@@ -286,6 +287,7 @@ function downloadBlob(blob: Blob, fileName: string) {
 
 function ProjectPackagerPage() {
   const { notify } = useToast();
+  const navigate = useNavigate();
   const [form, setForm] = useState<ProjectForm>({
     projectName: '',
     clientName: '',
@@ -681,6 +683,31 @@ function ProjectPackagerPage() {
     }
   };
 
+  const handOffToFloorMap = () => {
+    const projectData = buildProjectJson();
+    const payload = {
+      project: projectData.project,
+      panoramas: projectData.panoramas,
+      floorplans: projectData.floorplans,
+      qa: projectData.qa,
+      floorMaps: projectData.floorMaps,
+      createdAt: new Date().toISOString(),
+      source: 'packager',
+    };
+
+    sessionStorage.setItem(projectHandoffStorageKey, JSON.stringify(payload));
+
+    if (panoramas.length === 0) {
+      notify('パノラマが未登録です。必要に応じて案件パッケージ作成で追加してください。', 'warning');
+    } else if (form.projectName.trim().length === 0) {
+      notify('案件名が未入力です。必要に応じて案件情報を入力してください。', 'warning');
+    } else {
+      notify('案件データを平面図ピン配置へ渡しました', 'success');
+    }
+
+    navigate('/floormap');
+  };
+
   return (
     <AppFrame toolName="案件パッケージ作成" status="基本機能版 v0.3">
       <section className="qaHero workspaceHero" aria-labelledby="packager-title">
@@ -1054,9 +1081,9 @@ function ProjectPackagerPage() {
             <h2>平面図にパノラマ位置を配置する</h2>
             <p>{nextFloorMapMessage}</p>
           </div>
-          <Link to="/floormap" className="button buttonPrimary">
-            平面図ピン配置を開く
-          </Link>
+          <button type="button" className="button buttonPrimary" onClick={handOffToFloorMap}>
+            平面図ピン配置へ送る
+          </button>
         </div>
         {form.projectName.trim().length === 0 ? <p>案件名を入力するとZIP出力できます。</p> : null}
         {panoramas.length === 0 ? <p>警告: パノラマ画像が0枚です。必要に応じて追加してください。</p> : null}

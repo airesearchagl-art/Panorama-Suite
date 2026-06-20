@@ -127,6 +127,19 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">直接連携</p>
+          <h2>案件データを平面図ピン配置へ送る</h2>
+          <ol className="docList">
+            <li>案件パッケージ作成で、案件情報、パノラマ、平面図、品質チェック結果を整理する。</li>
+            <li>「平面図ピン配置へ送る」を押すと、案件データがブラウザタブ内の一時データとして保存される。</li>
+            <li>平面図ピン配置ページへ移動すると、案件名、パノラマ一覧、平面図一覧、平面図ピン情報が自動で読み込まれる。</li>
+            <li>この受け渡しは sessionStorage を使います。外部送信は行いません。</li>
+            <li>画像ファイル本体は受け渡し対象外です。必要に応じて平面図画像を再登録してください。</li>
+            <li>従来どおり、案件データファイル（project.json / updated-project.json）を手動で読み込む方法も利用できます。</li>
+          </ol>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">External Tools</p>
           <h2>既存外部ツール</h2>
           <ul className="docList">
