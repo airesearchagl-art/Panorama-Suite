@@ -114,6 +114,19 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">Packager v0.3</p>
+          <h2>floorMapsをZIPに同梱する</h2>
+          <ol className="docList">
+            <li>FloorMap Builderで `updated-project.json` を書き出す。</li>
+            <li>Packagerの project.json 読み込みから `updated-project.json` を読み込む。</li>
+            <li>`floor-map.json` だけを反映したい場合は、Packagerの `floor-map.jsonを読み込む` から読み込む。</li>
+            <li>floorMaps一覧で平面図名、階、ピン数、平面図ファイル状態を確認する。</li>
+            <li>不足平面図画像がある場合は、同名の平面図実ファイルを再登録する。</li>
+            <li>ZIP出力すると `project.json` と `floor-maps/floor-map.json` にfloorMapsが保存される。</li>
+          </ol>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">External Tools</p>
           <h2>既存外部ツール</h2>
           <ul className="docList">

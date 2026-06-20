@@ -452,6 +452,56 @@ UIでは度数入力として扱い、0未満または360以上の値は 0〜359
 - Review Exporter: scene 別コメントやQA状態をレビュー資料へ出力
 - Share Hub: scene 情報を共有リンクや案件アーカイブへ反映
 
+## Panorama Project Packager v0.3 floorMaps対応
+
+Project Packager は FloorMap Builder が出力した `floorMaps` を再読み込み、確認、ZIP同梱できるようになりました。
+
+### floorMaps の役割
+
+`floorMaps` は、平面図画像とパノラマsceneの撮影位置ピンを紐づける管理データです。
+各FloorMapは平面図ファイル名、階、ピン一覧を持ち、各ピンは `panoramaId`、`label`、`x`、`y`、`direction`、`note` を保持します。
+
+### 読み込み
+
+- `updated-project.json`
+  - FloorMap Builderで出力した、元の `project.json` に `floorMaps` を追加したJSONです。
+  - Packagerの `project.json読み込み` から読み込めます。
+- `floor-map.json`
+  - `floorMaps` のみを含むJSONです。
+  - Packagerの `floor-map.jsonを読み込む` から読み込めます。
+  - 読み込んだ場合、現在の内部状態の `floorMaps` を上書きします。
+
+### ZIP内の floorMaps
+
+floorMaps がある場合、ZIP内に以下を追加します。
+
+```text
+project-name.zip
+├ project.json
+├ panoramas/
+├ floorplans/
+├ qa/
+└ floor-maps/
+   └ floor-map.json
+```
+
+- `project.json` には常に `floorMaps` を含めます。
+- `floor-maps/floor-map.json` は `floorMaps` のみを含みます。
+- `floorMaps` が空の場合、`floor-maps/floor-map.json` は省略できます。
+
+### 不足平面図ファイルの扱い
+
+`floorMaps[].imageFileName` と Packagerに登録済みの平面図実ファイル名を照合します。
+一致する実ファイルがない場合、floorMapsのメタ情報は `project.json` に残りますが、ZIP内に画像本体は含まれません。
+
+### FloorMap Builderとの連携フロー
+
+1. Panorama QAで画像品質を確認する。
+2. Project Packagerで案件ZIPまたは `project.json` を作成する。
+3. FloorMap Builderで `project.json` と平面図を読み込み、ピンを配置する。
+4. FloorMap Builderから `updated-project.json` または `floor-map.json` を出力する。
+5. Project Packagerで再読み込みし、floorMapsを含めて案件ZIPを保存する。
+
 ### 今後追加予定
 
 - 平面図ピン配置

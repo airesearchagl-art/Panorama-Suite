@@ -73,6 +73,26 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>PackagerでfloorMapsが表示されない場合</h2>
+          <p>読み込んだproject.jsonに `floorMaps` が含まれているか確認してください。`floor-map.json` だけを持っている場合は、Packagerの `floor-map.jsonを読み込む` から読み込んでください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>floor-map.jsonが読み込めない場合</h2>
+          <p>`floorMaps` 配列を含むJSONか確認してください。FloorMap Builderの `floor-map.json` 出力を使うのが基本です。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>平面図画像が未登録と表示される場合</h2>
+          <p>`floorMaps[].imageFileName` とPackagerに登録済みの平面図ファイル名が一致していません。同名の平面図画像を再登録してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>ZIPに平面図画像が含まれない場合</h2>
+          <p>project.jsonやfloor-map.jsonには平面図のファイル名とパスだけが保存されます。画像本体はPackagerで実ファイルを登録した場合のみZIPの `floorplans/` に含まれます。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>ツールが表示されない場合</h2>
           <p>Portalのキーワード、カテゴリ、状態フィルタが有効になっている可能性があります。表示中件数を確認し、必要に応じてリセットしてください。</p>
         </article>
