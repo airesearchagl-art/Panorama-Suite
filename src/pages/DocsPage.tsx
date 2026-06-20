@@ -53,6 +53,17 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">Availability</p>
+          <h2>ツールカードの状態表示</h2>
+          <ul className="docList">
+            <li>MVP公開中: 内部ツールとして利用可能な初期公開版です。</li>
+            <li>外部公開中: 別URLで公開されている既存ツールです。`↗` 付きで新規タブを開きます。</li>
+            <li>開発中: 実装中のためクリックできません。</li>
+            <li>構想中 / 将来予定: ロードマップ対象です。Coming Soonとして表示します。</li>
+          </ul>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">Packager Guide</p>
           <h2>scene別メタ情報編集</h2>
           <ol className="docList">

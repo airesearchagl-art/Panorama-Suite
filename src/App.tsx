@@ -1,6 +1,7 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import AppFrame from './components/AppFrame';
-import { categories, tools, type Tool, type ToolStatus } from './data/tools';
+import { ToastProvider, useToast } from './components/ToastProvider';
+import { categories, tools, type Tool, type ToolAvailability } from './data/tools';
 import DesignSystemPage from './pages/DesignSystemPage';
 import DocsPage from './pages/DocsPage';
 import HelpPage from './pages/HelpPage';
@@ -8,24 +9,38 @@ import PanoramaConverterPage from './pages/PanoramaConverterPage';
 import PanoramaQaPage from './pages/PanoramaQaPage';
 import ProjectPackagerPage from './pages/ProjectPackagerPage';
 
-const statusTone: Record<ToolStatus, string> = {
-  公開中: 'statusLive',
-  MVP公開中: 'statusLive',
-  構想中: 'statusConcept',
-  開発予定: 'statusPlanned',
+const statusTone: Record<ToolAvailability, string> = {
+  available: 'statusAvailable',
+  mvp: 'statusMvp',
+  external: 'statusExternal',
+  development: 'statusDevelopment',
+  concept: 'statusConcept',
+  future: 'statusFuture',
 };
 
 function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }) {
+  const { notify } = useToast();
+  const disabledReason = tool.availability === 'development' ? 'このツールは現在開発中です。' : 'このツールは現在準備中です。';
+
+  const handleDisabledClick = () => {
+    notify(disabledReason);
+  };
+
   return (
-    <article className={`toolCard ${featured ? 'featuredCard' : ''}`}>
+    <article
+      className={`toolCard ${featured ? 'featuredCard' : ''} ${!tool.isEnabled ? 'toolCardDisabled' : ''}`}
+      aria-disabled={!tool.isEnabled}
+      title={!tool.isEnabled ? disabledReason : undefined}
+      onClick={!tool.isEnabled ? handleDisabledClick : undefined}
+    >
       <div className="cardHeader">
         <div>
           <p className="categoryLabel">{tool.category}</p>
           <h3>{tool.name}</h3>
         </div>
-        <span className={`statusBadge ${statusTone[tool.status]}`}>{tool.status}</span>
+        <span className={`statusBadge ${statusTone[tool.availability]}`}>{tool.statusLabel}</span>
       </div>
-      <p className="summary">{tool.summary}</p>
+      <p className="summary">{tool.description}</p>
       <ul className="capabilityList" aria-label={`${tool.name} の主な機能`}>
         {tool.capabilities.map((capability) => (
           <li key={capability}>{capability}</li>
@@ -33,16 +48,24 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
       </ul>
       <div className="cardFooter">
         <span className="priority">優先度: {tool.priority}</span>
-        {tool.path ? (
-          <Link to={tool.path} className="toolLink">
+        {tool.isEnabled && tool.href && !tool.isExternal ? (
+          <Link to={tool.href} className="toolLink">
             開く
           </Link>
-        ) : tool.href ? (
-          <a href={tool.href} target="_blank" rel="noreferrer" className="toolLink">
-            開く
+        ) : tool.isEnabled && tool.href && tool.isExternal ? (
+          <a
+            href={tool.href}
+            target="_blank"
+            rel="noreferrer"
+            className="toolLink"
+            onClick={() => notify('外部ツールを開きます。')}
+          >
+            開く ↗
           </a>
         ) : (
-          <span className="pendingText">ロードマップ対象</span>
+          <button type="button" className="toolLink toolLinkDisabled" disabled onClick={handleDisabledClick} tabIndex={-1}>
+            {tool.availability === 'development' ? '開発中' : 'Coming Soon'}
+          </button>
         )}
       </div>
     </article>
@@ -50,9 +73,10 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
 }
 
 function PortalPage() {
-  const liveCount = tools.filter((tool) => tool.status === '公開中' || tool.status === 'MVP公開中').length;
-  const mvpCount = tools.filter((tool) => tool.status === 'MVP公開中').length;
-  const plannedCount = tools.filter((tool) => tool.status !== '公開中' && tool.status !== 'MVP公開中').length;
+  const availableCount = tools.filter((tool) => tool.isEnabled).length;
+  const mvpCount = tools.filter((tool) => tool.availability === 'mvp').length;
+  const developmentCount = tools.filter((tool) => tool.availability === 'development').length;
+  const futureCount = tools.filter((tool) => tool.availability === 'future' || tool.availability === 'concept').length;
 
   return (
     <AppFrame toolName="Portal" status="Workspace">
@@ -70,9 +94,10 @@ function PortalPage() {
 
       <section className="dashboardGrid" aria-label="Portal Dashboard">
         <article className="metricCard"><span>Tools</span><strong>{tools.length}</strong></article>
-        <article className="metricCard"><span>Released</span><strong>{liveCount}</strong></article>
+        <article className="metricCard successMetric"><span>Available</span><strong>{availableCount}</strong></article>
         <article className="metricCard"><span>MVP</span><strong>{mvpCount}</strong></article>
-        <article className="metricCard"><span>Planned</span><strong>{plannedCount}</strong></article>
+        <article className="metricCard warningMetric"><span>Development</span><strong>{developmentCount}</strong></article>
+        <article className="metricCard"><span>Future</span><strong>{futureCount}</strong></article>
       </section>
 
       <section className="sectionBlock" aria-labelledby="categories-title">
@@ -129,15 +154,17 @@ function PortalPage() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<PortalPage />} />
-      <Route path="/qa" element={<PanoramaQaPage />} />
-      <Route path="/packager" element={<ProjectPackagerPage />} />
-      <Route path="/converter" element={<PanoramaConverterPage />} />
-      <Route path="/docs" element={<DocsPage />} />
-      <Route path="/help" element={<HelpPage />} />
-      <Route path="/docs/design-system" element={<DesignSystemPage />} />
-    </Routes>
+    <ToastProvider>
+      <Routes>
+        <Route path="/" element={<PortalPage />} />
+        <Route path="/qa" element={<PanoramaQaPage />} />
+        <Route path="/packager" element={<ProjectPackagerPage />} />
+        <Route path="/converter" element={<PanoramaConverterPage />} />
+        <Route path="/docs" element={<DocsPage />} />
+        <Route path="/help" element={<HelpPage />} />
+        <Route path="/docs/design-system" element={<DesignSystemPage />} />
+      </Routes>
+    </ToastProvider>
   );
 }
 

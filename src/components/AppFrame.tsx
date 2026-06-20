@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { enabledTools, tools } from '../data/tools';
 
 type AppFrameProps = {
   toolName: string;
@@ -42,9 +43,26 @@ function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: A
             <span className="sideLabel">Dashboard</span>
             <NavLink to="/">Portal</NavLink>
             <span className="sideLabel">Tools</span>
-            <NavLink to="/qa">Panorama QA</NavLink>
-            <NavLink to="/packager">Project Packager</NavLink>
-            <NavLink to="/converter">Panorama Converter</NavLink>
+            {enabledTools
+              .filter((tool) => tool.category !== 'Documentation')
+              .map((tool) =>
+                tool.isExternal && tool.href ? (
+                  <a href={tool.href} target="_blank" rel="noreferrer" key={tool.id}>
+                    {tool.name} ↗
+                  </a>
+                ) : (
+                  <NavLink to={tool.href ?? '/'} key={tool.id}>{tool.name}</NavLink>
+                ),
+              )}
+            <span className="sideLabel">Coming Soon</span>
+            {tools
+              .filter((tool) => !tool.isEnabled)
+              .slice(0, 5)
+              .map((tool) => (
+                <span className="sideDisabledLink" aria-disabled="true" title={tool.statusLabel} key={tool.id}>
+                  {tool.name}
+                </span>
+              ))}
             <span className="sideLabel">Guide</span>
             <NavLink to="/docs">Documentation</NavLink>
             <NavLink to="/help">Help</NavLink>

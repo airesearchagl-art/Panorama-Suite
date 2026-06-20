@@ -205,6 +205,13 @@ button {
   color: #ffffff;
 }
 
+.sideDisabledLink {
+  border-radius: 6px;
+  padding: 9px 10px;
+  color: rgba(156, 163, 175, 0.48);
+  cursor: not-allowed;
+}
+
 .sideLabel {
   margin-top: 10px;
   color: var(--color-text-muted);
@@ -288,6 +295,21 @@ button {
 .qaActions button:disabled {
   cursor: not-allowed;
   opacity: 0.42;
+}
+
+.toast {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 30;
+  max-width: min(360px, calc(100vw - 44px));
+  border: 1px solid rgba(79, 124, 255, 0.42);
+  border-radius: var(--radius-card);
+  background: #0c1220;
+  box-shadow: var(--shadow-card);
+  color: var(--color-text-main);
+  padding: 12px 14px;
+  font-weight: 800;
 }
 
 .dashboardGrid {
@@ -552,6 +574,22 @@ h1 {
   padding: 20px;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
+  position: relative;
+}
+
+.toolCardDisabled {
+  cursor: not-allowed;
+  filter: grayscale(0.55);
+  opacity: 0.58;
+}
+
+.toolCardDisabled::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+  background: rgba(17, 24, 39, 0.18);
+  pointer-events: none;
 }
 
 .featuredCard {
@@ -587,14 +625,45 @@ h1 {
   background: #e9f5ef;
 }
 
+.statusAvailable {
+  color: #dbeafe;
+  background: rgba(79, 124, 255, 0.2);
+  border-color: rgba(79, 124, 255, 0.58);
+}
+
+.statusMvp {
+  color: #dbeafe;
+  background: rgba(79, 124, 255, 0.26);
+  border-color: rgba(79, 124, 255, 0.72);
+}
+
+.statusExternal {
+  color: #ede9fe;
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.54);
+}
+
+.statusDevelopment {
+  color: #fef3c7;
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.52);
+}
+
 .statusConcept {
-  color: var(--warn);
-  background: #fbf1df;
+  color: #d1d5db;
+  background: rgba(156, 163, 175, 0.14);
+  border-color: rgba(156, 163, 175, 0.38);
 }
 
 .statusPlanned {
   color: var(--planned);
   background: #e8f0f8;
+}
+
+.statusFuture {
+  color: #9ca3af;
+  background: rgba(17, 24, 39, 0.72);
+  border-color: rgba(75, 85, 99, 0.8);
 }
 
 .summary {
@@ -653,6 +722,15 @@ h1 {
 .toolLink:focus-visible {
   background: var(--accent-strong);
   border-color: var(--accent-strong);
+}
+
+.toolLinkDisabled,
+.toolLinkDisabled:hover,
+.toolLinkDisabled:focus-visible {
+  border-color: var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text-muted);
+  pointer-events: none;
 }
 
 .categoryStack {
