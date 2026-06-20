@@ -1594,6 +1594,197 @@ h1 {
   min-width: 1040px;
 }
 
+.floorMapLayout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 360px;
+  gap: 18px;
+  margin-top: 18px;
+  align-items: start;
+}
+
+.floorMapControlPanel,
+.floorMapCanvasPanel,
+.floorMapSidePanel {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.floorMapControlPanel,
+.floorMapSidePanel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.floorMapControlPanel h2,
+.floorMapSidePanel h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.floorMapCanvasPanel {
+  min-width: 0;
+  padding: 18px;
+}
+
+.floorMapMeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px auto;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.floorMapMeta label,
+.panoramaPickList label,
+.pinEditorCard label {
+  display: grid;
+  gap: 6px;
+}
+
+.floorMapMeta span,
+.panoramaPickList span,
+.pinEditorCard span {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.floorMapMeta input,
+.panoramaPickList select,
+.pinEditorCard input,
+.pinEditorCard select {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #111827;
+  color: var(--color-text-main);
+  padding: 7px 9px;
+  font: inherit;
+}
+
+.floorMapMeta strong {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.floorMapCanvas {
+  position: relative;
+  overflow: hidden;
+  min-height: 420px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-card);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 64px),
+    #111827;
+  cursor: crosshair;
+}
+
+.floorMapCanvas img {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 420px;
+  object-fit: contain;
+}
+
+.floorMapPin {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.38);
+}
+
+.floorMapPin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 22px;
+  transform: translate(-50%, -100%) rotate(var(--pin-direction));
+  transform-origin: bottom center;
+  background: var(--color-warning);
+}
+
+.floorMapPin span {
+  position: relative;
+  z-index: 1;
+}
+
+.floorMapEmpty {
+  min-height: 420px;
+}
+
+.panoramaPickList,
+.pinEditorList {
+  display: grid;
+  gap: 10px;
+}
+
+.panoramaPickList ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panoramaPickList li,
+.pinEditorCard {
+  display: grid;
+  gap: 7px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  padding: 11px;
+}
+
+.panoramaPickList li strong,
+.panoramaPickList li span,
+.panoramaPickList li small,
+.panoramaPickList li b {
+  overflow-wrap: anywhere;
+}
+
+.panoramaPickList li span,
+.panoramaPickList li small {
+  color: var(--color-text-muted);
+}
+
+.panoramaPickList li b {
+  justify-self: start;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 3px 7px;
+  font-size: 0.72rem;
+}
+
+.assignedScene b {
+  color: var(--color-success);
+}
+
+.unassignedScene b {
+  color: var(--color-warning);
+}
+
+.pinCoordinateGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .convertStatus {
   display: inline-flex;
   min-width: 74px;
@@ -1703,7 +1894,9 @@ h1 {
   .packagerLayout,
   .zipPreview,
   .importPanel,
-  .converterLayout {
+  .converterLayout,
+  .floorMapLayout,
+  .floorMapMeta {
     grid-template-columns: 1fr;
   }
 
@@ -1829,5 +2022,9 @@ h1 {
 
   .packagerFooter button {
     width: 100%;
+  }
+
+  .pinCoordinateGrid {
+    grid-template-columns: 1fr;
   }
 }

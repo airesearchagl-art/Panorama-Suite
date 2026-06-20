@@ -18,7 +18,7 @@ function DocsPage() {
 
       <section className="dashboardGrid">
         <article className="metricCard"><span>Version</span><strong>v0.1.0</strong></article>
-        <article className="metricCard"><span>MVP Tools</span><strong>3</strong></article>
+        <article className="metricCard"><span>MVP Tools</span><strong>4</strong></article>
         <article className="metricCard successMetric"><span>Processing</span><strong>Local</strong></article>
         <article className="metricCard"><span>Release</span><strong>Vercel</strong></article>
       </section>
@@ -38,6 +38,7 @@ function DocsPage() {
             <li>Panorama QA: <a href={publicUrls.qa}>{publicUrls.qa}</a></li>
             <li>Project Packager: <a href={publicUrls.packager}>{publicUrls.packager}</a></li>
             <li>Panorama Converter: <a href={publicUrls.converter}>{publicUrls.converter}</a></li>
+            <li>FloorMap Builder: <a href={publicUrls.floormap}>{publicUrls.floormap}</a></li>
           </ul>
         </article>
 
@@ -49,6 +50,7 @@ function DocsPage() {
             <li>Panorama QA: 解像度、2:1比率、命名規則を検査。</li>
             <li>Project Packager: 画像、平面図、QA結果、scene別メタ情報をZIP化。</li>
             <li>Panorama Converter: 形式変換、画質調整、リサイズ、ZIP出力。</li>
+            <li>FloorMap Builder: 平面図上にパノラマsceneの撮影位置ピンを配置。</li>
           </ul>
         </article>
 
@@ -98,6 +100,20 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">FloorMap Builder Guide</p>
+          <h2>平面図ピン配置</h2>
+          <ol className="docList">
+            <li>平面図画像を読み込む。</li>
+            <li>Project Packagerで出力したproject.jsonを読み込む。</li>
+            <li>配置するパノラマを選ぶ。</li>
+            <li>平面図をクリックしてピンを置く。</li>
+            <li>x / y %座標、方位、ラベル、コメントを調整する。</li>
+            <li>floor-map.jsonを書き出す。</li>
+            <li>updated-project.jsonを書き出す。</li>
+          </ol>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">External Tools</p>
           <h2>既存外部ツール</h2>
           <ul className="docList">
@@ -113,6 +129,7 @@ function DocsPage() {
             <li>Converterで形式と解像度を整える。</li>
             <li>QAで初期品質を確認する。</li>
             <li>Packagerで案件情報、scene別メタ情報、画像、QA結果をZIP化する。</li>
+            <li>FloorMap Builderで平面図に撮影位置ピンを配置する。</li>
             <li>レビュー・共有・アーカイブへ展開する。</li>
           </ol>
         </article>
@@ -129,7 +146,7 @@ function DocsPage() {
           <ul className="docList">
             <li>DocumentationとHelpの拡張。</li>
             <li>Packagerのscene別メタ情報編集。</li>
-            <li>平面図ピン配置。</li>
+            <li>FloorMap BuilderとPackagerの直接連携。</li>
             <li>QA、Converter、Packagerの直接連携。</li>
           </ul>
         </article>

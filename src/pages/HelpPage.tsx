@@ -48,6 +48,31 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>平面図が表示されない場合</h2>
+          <p>FloorMap Builderの対応形式は jpg、jpeg、png、webp です。読み込み後は中央のキャンバスに表示されます。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>FloorMapでproject.jsonを読み込めない場合</h2>
+          <p>JSONとして読めること、`project` が存在すること、`panoramas` が配列であることを確認してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>ピン位置がずれる場合</h2>
+          <p>ピン位置は画像上の x / y %座標で保存します。画像サイズが変わっても相対位置を保ちますが、余白付き画像や別比率の差し替えでは見え方が変わる場合があります。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>x / y %座標とは何か</h2>
+          <p>xは左端から右方向、yは上端から下方向の割合です。左上が 0 / 0、右下が 100 / 100 です。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>updated-project.jsonの使い方</h2>
+          <p>元のproject.jsonに floorMaps を追加したJSONです。将来のPackager再読み込み、Review Exporter、Share Hub連携に使う想定です。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>ツールが表示されない場合</h2>
           <p>Portalのキーワード、カテゴリ、状態フィルタが有効になっている可能性があります。表示中件数を確認し、必要に応じてリセットしてください。</p>
         </article>
@@ -74,6 +99,7 @@ function HelpPage() {
             <li>QA: <a href={publicUrls.qa}>{publicUrls.qa}</a></li>
             <li>Packager: <a href={publicUrls.packager}>{publicUrls.packager}</a></li>
             <li>Converter: <a href={publicUrls.converter}>{publicUrls.converter}</a></li>
+            <li>FloorMap Builder: <a href={publicUrls.floormap}>{publicUrls.floormap}</a></li>
           </ul>
         </article>
 

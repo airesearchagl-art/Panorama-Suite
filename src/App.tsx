@@ -5,6 +5,7 @@ import { ToastProvider, useToast } from './components/ToastProvider';
 import { availabilityLabels, categories, tools, type Tool, type ToolAvailability, type ToolCategory } from './data/tools';
 import DesignSystemPage from './pages/DesignSystemPage';
 import DocsPage from './pages/DocsPage';
+import FloorMapBuilderPage from './pages/FloorMapBuilderPage';
 import HelpPage from './pages/HelpPage';
 import PanoramaConverterPage from './pages/PanoramaConverterPage';
 import PanoramaQaPage from './pages/PanoramaQaPage';
@@ -239,6 +240,7 @@ function App() {
         <Route path="/qa" element={<PanoramaQaPage />} />
         <Route path="/packager" element={<ProjectPackagerPage />} />
         <Route path="/converter" element={<PanoramaConverterPage />} />
+        <Route path="/floormap" element={<FloorMapBuilderPage />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/docs/design-system" element={<DesignSystemPage />} />
