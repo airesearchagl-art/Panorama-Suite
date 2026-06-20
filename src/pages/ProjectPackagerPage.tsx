@@ -24,6 +24,9 @@ type PanoramaEntry = {
   floor: string;
   locationName: string;
   direction: number;
+  sceneType: string;
+  note: string;
+  sortOrder: number;
   qaStatus: string;
   fileState: FileState;
 };
@@ -81,6 +84,7 @@ type ProjectJson = {
 
 const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'webp']);
 const emptyQaSummary: QaSummary = { total: 0, ok: 0, warning: 0, error: 0 };
+const sceneTypeOptions = ['エントランス', '執務エリア', '会議室', '食堂', 'ラウンジ', '廊下', '階段', '外観', '現場', 'その他'];
 
 function getExtension(fileName: string) {
   const lastDot = fileName.lastIndexOf('.');
@@ -112,6 +116,20 @@ function normalizeQaSummary(summary?: Partial<QaSummary>): QaSummary {
     warning: Number(summary?.warning ?? 0),
     error: Number(summary?.error ?? 0),
   };
+}
+
+function normalizeDirection(value: number) {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return ((Math.round(value) % 360) + 360) % 360;
+}
+
+function normalizeSortOrder(value: number, fallback: number) {
+  if (!Number.isFinite(value)) {
+    return fallback;
+  }
+  return Math.max(1, Math.round(value));
 }
 
 function validateProjectJson(value: unknown): ProjectJson {
@@ -229,11 +247,22 @@ function ProjectPackagerPage() {
   const qaByFileName = useMemo(() => new Map(qaRows.map((row) => [row.fileName, row.status ?? ''])), [qaRows]);
   const missingPanoramas = panoramas.filter((panorama) => !panorama.file);
   const missingFloorplans = floorplans.filter((floorplan) => !floorplan.file);
+  const metadataComplete = panoramas.filter((panorama) => panorama.locationName.trim().length > 0).length;
+  const sortedPanoramas = useMemo(
+    () => [...panoramas].sort((a, b) => a.sortOrder - b.sortOrder || a.fileName.localeCompare(b.fileName)),
+    [panoramas],
+  );
   const safeProjectName = sanitizeFileName(form.projectName);
   const canExport = form.projectName.trim().length > 0 && !isPackaging;
 
   const updateForm = (key: keyof ProjectForm, value: string) => {
     setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  const updatePanorama = <Key extends keyof PanoramaEntry>(id: string, key: Key, value: PanoramaEntry[Key]) => {
+    setPanoramas((current) =>
+      current.map((panorama) => (panorama.id === id ? { ...panorama, [key]: value } : panorama)),
+    );
   };
 
   const addPanoramas = async (fileList: FileList | null) => {
@@ -274,6 +303,9 @@ function ProjectPackagerPage() {
           floor: existingIndex >= 0 ? next[existingIndex].floor : '',
           locationName: existingIndex >= 0 ? next[existingIndex].locationName : '',
           direction: existingIndex >= 0 ? next[existingIndex].direction : 0,
+          sceneType: existingIndex >= 0 ? next[existingIndex].sceneType : '',
+          note: existingIndex >= 0 ? next[existingIndex].note : '',
+          sortOrder: existingIndex >= 0 ? next[existingIndex].sortOrder : next.length + 1,
           qaStatus: qaByFileName.get(file.name) ?? (existingIndex >= 0 ? next[existingIndex].qaStatus : ''),
           fileState: '実ファイル登録済み',
         };
@@ -394,7 +426,10 @@ function ProjectPackagerPage() {
           height: Number(panorama.height ?? 0),
           floor: String(panorama.floor ?? ''),
           locationName: String(panorama.locationName ?? ''),
-          direction: Number(panorama.direction ?? 0),
+          direction: normalizeDirection(Number(panorama.direction ?? 0)),
+          sceneType: String(panorama.sceneType ?? ''),
+          note: String(panorama.note ?? ''),
+          sortOrder: normalizeSortOrder(Number(panorama.sortOrder ?? index + 1), index + 1),
           qaStatus: String(panorama.qaStatus ?? ''),
           fileState: 'ファイル未再登録',
         })),
@@ -451,7 +486,10 @@ function ProjectPackagerPage() {
         fileSize: panorama.fileSize,
         floor: panorama.floor,
         locationName: panorama.locationName,
-        direction: panorama.direction,
+        direction: normalizeDirection(panorama.direction),
+        sceneType: panorama.sceneType,
+        note: panorama.note,
+        sortOrder: normalizeSortOrder(panorama.sortOrder, index + 1),
         qaStatus: qaByFileName.get(panorama.fileName) ?? panorama.qaStatus,
       })),
       floorplans: floorplans.map((floorplan, index) => ({
@@ -529,6 +567,7 @@ function ProjectPackagerPage() {
         <article className="metricCard"><span>Floorplans</span><strong>{floorplans.length}</strong></article>
         <article className="metricCard warningMetric"><span>Missing Files</span><strong>{missingPanoramas.length + missingFloorplans.length}</strong></article>
         <article className="metricCard"><span>QA Status</span><strong>{qaSummary.total > 0 ? `${qaSummary.ok}/${qaSummary.total}` : '-'}</strong></article>
+        <article className="metricCard successMetric"><span>Metadata Complete</span><strong>{metadataComplete}/{panoramas.length}</strong></article>
       </section>
 
       <section className="importPanel" aria-labelledby="import-title">
@@ -652,7 +691,7 @@ function ProjectPackagerPage() {
                 <thead>
                   <tr>
                     <th>パノラマ</th>
-                    <th>パス</th>
+                    <th>Scene Metadata</th>
                     <th>解像度</th>
                     <th>QA</th>
                     <th>状態</th>
@@ -670,10 +709,81 @@ function ProjectPackagerPage() {
                       </td>
                     </tr>
                   ) : (
-                    panoramas.map((panorama) => (
+                    sortedPanoramas.map((panorama) => (
                       <tr key={panorama.id}>
-                        <td>{panorama.fileName}</td>
-                        <td>{panorama.path}</td>
+                        <td>
+                          <div className="sceneIdentity">
+                            <strong>{panorama.fileName}</strong>
+                            <span>{panorama.path}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="sceneMetaGrid">
+                            <label>
+                              <span>階</span>
+                              <input
+                                value={panorama.floor}
+                                onChange={(event) => updatePanorama(panorama.id, 'floor', event.target.value)}
+                                placeholder="例: 3F"
+                              />
+                            </label>
+                            <label>
+                              <span>場所名</span>
+                              <input
+                                value={panorama.locationName}
+                                onChange={(event) => updatePanorama(panorama.id, 'locationName', event.target.value)}
+                                placeholder="例: エントランス"
+                              />
+                            </label>
+                            <label>
+                              <span>方位</span>
+                              <div className="degreeInput">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max="359"
+                                  value={panorama.direction}
+                                  onBlur={() => updatePanorama(panorama.id, 'direction', normalizeDirection(panorama.direction))}
+                                  onChange={(event) =>
+                                    updatePanorama(panorama.id, 'direction', normalizeDirection(Number(event.target.value || 0)))
+                                  }
+                                />
+                                <b>°</b>
+                              </div>
+                            </label>
+                            <label>
+                              <span>シーン種別</span>
+                              <select
+                                value={panorama.sceneType}
+                                onChange={(event) => updatePanorama(panorama.id, 'sceneType', event.target.value)}
+                              >
+                                <option value="">未設定</option>
+                                {sceneTypeOptions.map((option) => (
+                                  <option value={option} key={option}>{option}</option>
+                                ))}
+                              </select>
+                            </label>
+                            <label>
+                              <span>表示順</span>
+                              <input
+                                type="number"
+                                min="1"
+                                value={panorama.sortOrder}
+                                onChange={(event) =>
+                                  updatePanorama(panorama.id, 'sortOrder', normalizeSortOrder(Number(event.target.value), panorama.sortOrder))
+                                }
+                              />
+                            </label>
+                            <label className="sceneNoteField">
+                              <span>コメント</span>
+                              <input
+                                value={panorama.note}
+                                onChange={(event) => updatePanorama(panorama.id, 'note', event.target.value)}
+                                placeholder="レビュー時の補足"
+                              />
+                            </label>
+                          </div>
+                        </td>
                         <td>{panorama.width} x {panorama.height}</td>
                         <td>{qaByFileName.get(panorama.fileName) || panorama.qaStatus || '-'}</td>
                         <td><span className={panorama.file ? 'fileStateReady' : 'fileStateMissing'}>{panorama.fileState}</span></td>

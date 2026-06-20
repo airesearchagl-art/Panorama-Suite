@@ -47,9 +47,21 @@ function DocsPage() {
           <ul className="docList">
             <li>Portal: ツール群とステータスを俯瞰する入口。</li>
             <li>Panorama QA: 解像度、2:1比率、命名規則を検査。</li>
-            <li>Project Packager: 画像、平面図、QA結果、メタ情報をZIP化。</li>
+            <li>Project Packager: 画像、平面図、QA結果、scene別メタ情報をZIP化。</li>
             <li>Panorama Converter: 形式変換、画質調整、リサイズ、ZIP出力。</li>
           </ul>
+        </article>
+
+        <article className="infoPanel">
+          <p className="sectionKicker">Packager Guide</p>
+          <h2>scene別メタ情報編集</h2>
+          <ol className="docList">
+            <li>パノラマ画像を登録する。</li>
+            <li>各sceneに階、場所名、方位、シーン種別、コメント、表示順を設定する。</li>
+            <li>Panorama QAで出力したQA結果JSONを読み込む。</li>
+            <li>project.json付きZIPを出力する。</li>
+            <li>後からproject.jsonを読み込んで再編集する。</li>
+          </ol>
         </article>
 
         <article className="infoPanel">
@@ -67,7 +79,7 @@ function DocsPage() {
           <ol className="docList">
             <li>Converterで形式と解像度を整える。</li>
             <li>QAで初期品質を確認する。</li>
-            <li>Packagerで案件情報、画像、QA結果をZIP化する。</li>
+            <li>Packagerで案件情報、scene別メタ情報、画像、QA結果をZIP化する。</li>
             <li>レビュー・共有・アーカイブへ展開する。</li>
           </ol>
         </article>

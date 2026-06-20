@@ -292,7 +292,7 @@ button {
 
 .dashboardGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
 }
 
@@ -1291,6 +1291,73 @@ h1 {
   background: #fae8e8;
 }
 
+.sceneIdentity {
+  display: grid;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.sceneIdentity strong {
+  color: var(--color-text-main);
+}
+
+.sceneIdentity span {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.sceneMetaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(110px, 1fr));
+  gap: 10px;
+  min-width: 560px;
+}
+
+.sceneMetaGrid label {
+  display: grid;
+  gap: 5px;
+}
+
+.sceneMetaGrid span {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.sceneMetaGrid input,
+.sceneMetaGrid select {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #111827;
+  color: var(--color-text-main);
+  padding: 7px 9px;
+  font: inherit;
+  font-size: 0.86rem;
+}
+
+.sceneMetaGrid input:focus,
+.sceneMetaGrid select:focus {
+  border-color: var(--color-accent);
+  outline: 2px solid rgba(79, 124, 255, 0.22);
+}
+
+.degreeInput {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.degreeInput b {
+  color: var(--color-text-muted);
+}
+
+.sceneNoteField {
+  grid-column: span 2;
+}
+
 .converterLayout {
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
@@ -1445,6 +1512,11 @@ h1 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .sceneMetaGrid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    min-width: 460px;
+  }
+
   .heroSection {
     grid-template-columns: 1fr;
     align-items: start;
@@ -1521,6 +1593,15 @@ h1 {
   .docGrid,
   .paletteGrid {
     grid-template-columns: 1fr;
+  }
+
+  .sceneMetaGrid {
+    grid-template-columns: 1fr;
+    min-width: 320px;
+  }
+
+  .sceneNoteField {
+    grid-column: auto;
   }
 
   .appShell {
