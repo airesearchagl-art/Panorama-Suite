@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import AppFrame from './components/AppFrame';
 import { ToastProvider, useToast } from './components/ToastProvider';
-import { availabilityLabels, categories, tools, type Tool, type ToolAvailability, type ToolCategory } from './data/tools';
+import { availabilityLabels, categories, getCategoryLabel, tools, type Tool, type ToolAvailability, type ToolCategory } from './data/tools';
 import DesignSystemPage from './pages/DesignSystemPage';
 import DocsPage from './pages/DocsPage';
 import FloorMapBuilderPage from './pages/FloorMapBuilderPage';
@@ -39,7 +39,7 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
     >
       <div className="cardHeader">
         <div>
-          <p className="categoryLabel">{tool.category}</p>
+          <p className="categoryLabel">{getCategoryLabel(tool.category)}</p>
           <h3>{tool.displayName}</h3>
           {tool.displayName !== tool.name ? <small className="toolEnglishName">{tool.name}</small> : null}
         </div>
@@ -91,7 +91,7 @@ function PortalPage() {
     return tools.filter((tool) => {
       const matchesKeyword =
         normalizedKeyword.length === 0 ||
-        [tool.name, tool.displayName, tool.description, tool.category, tool.statusLabel, tool.availability]
+        [tool.name, tool.displayName, tool.description, tool.category, getCategoryLabel(tool.category), tool.statusLabel, tool.availability]
           .join(' ')
           .toLowerCase()
           .includes(normalizedKeyword);
@@ -151,9 +151,9 @@ function PortalPage() {
           <label>
             <span>カテゴリ</span>
             <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value as ToolCategory | 'All')}>
-              <option value="All">All</option>
+              <option value="All">すべて</option>
               {categories.map((category) => (
-                <option value={category} key={category}>{category}</option>
+                <option value={category} key={category}>{getCategoryLabel(category)}</option>
               ))}
             </select>
           </label>
@@ -163,7 +163,7 @@ function PortalPage() {
               value={availabilityFilter}
               onChange={(event) => setAvailabilityFilter(event.target.value as ToolAvailability | 'All')}
             >
-              <option value="All">All</option>
+              <option value="All">すべて</option>
               {availabilityOptions.map((availability) => (
                 <option value={availability} key={availability}>{availabilityLabels[availability]}</option>
               ))}
@@ -173,9 +173,9 @@ function PortalPage() {
             リセット
           </button>
           <div className="filterState" aria-live="polite">
-            <strong>表示中: {filteredTools.length} / {tools.length} tools</strong>
-            <span>カテゴリ: {categoryFilter}</span>
-            <span>状態: {availabilityFilter === 'All' ? 'All' : availabilityLabels[availabilityFilter]}</span>
+            <strong>表示中: {filteredTools.length} / {tools.length} 件</strong>
+            <span>カテゴリ: {categoryFilter === 'All' ? 'すべて' : getCategoryLabel(categoryFilter)}</span>
+            <span>状態: {availabilityFilter === 'All' ? 'すべて' : availabilityLabels[availabilityFilter]}</span>
           </div>
         </div>
         <div className="categoryStack">
@@ -187,7 +187,7 @@ function PortalPage() {
             return (
               <section className="categoryBand" key={category} aria-labelledby={`${category}-title`}>
                 <div className="categoryTitle">
-                  <h3 id={`${category}-title`}>{category}</h3>
+                  <h3 id={`${category}-title`}>{getCategoryLabel(category)}</h3>
                   <span>{categoryTools.length} 件</span>
                 </div>
                 <div className="toolGrid">

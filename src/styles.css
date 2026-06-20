@@ -1370,6 +1370,33 @@ h1 {
   opacity: 0.42;
 }
 
+.nextActionPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  border: 1px solid rgba(79, 124, 255, 0.45);
+  border-radius: var(--radius-card);
+  background: rgba(79, 124, 255, 0.1);
+  padding: 16px;
+}
+
+.nextActionPanel h2,
+.nextActionPanel p {
+  margin: 0;
+}
+
+.nextActionPanel h2 {
+  margin-top: 4px;
+  font-size: 1.1rem;
+}
+
+.nextActionPanel p {
+  margin-top: 6px;
+  color: var(--color-text-muted);
+}
+
 .importPanel,
 .importedInfo,
 .missingNotice {
@@ -1927,6 +1954,10 @@ h1 {
   .packagerFooter {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .nextActionPanel {
+    grid-template-columns: 1fr;
   }
 
   .importedInfo {

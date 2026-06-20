@@ -1,5 +1,6 @@
 import JSZip from 'jszip';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
 
@@ -317,6 +318,11 @@ function ProjectPackagerPage() {
   );
   const safeProjectName = sanitizeFileName(form.projectName);
   const canExport = form.projectName.trim().length > 0 && !isPackaging;
+  const nextFloorMapMessage = floorMaps.length > 0
+    ? '登録済みの平面図ピン情報を確認・編集できます。'
+    : panoramas.length > 0
+      ? '登録したパノラマを平面図に配置できます。'
+      : '先に案件データファイルを作成または読み込んでください。';
 
   const updateForm = (key: keyof ProjectForm, value: string) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -1042,6 +1048,16 @@ function ProjectPackagerPage() {
       </section>
 
       <section className="packagerFooter">
+        <div className="nextActionPanel">
+          <div>
+            <p className="sectionKicker">次の作業</p>
+            <h2>平面図にパノラマ位置を配置する</h2>
+            <p>{nextFloorMapMessage}</p>
+          </div>
+          <Link to="/floormap" className="button buttonPrimary">
+            平面図ピン配置を開く
+          </Link>
+        </div>
         {form.projectName.trim().length === 0 ? <p>案件名を入力するとZIP出力できます。</p> : null}
         {panoramas.length === 0 ? <p>警告: パノラマ画像が0枚です。必要に応じて追加してください。</p> : null}
         {(missingPanoramas.length > 0 || missingFloorplans.length > 0) ? <p>警告: 未再登録ファイルはZIPに含まれません。</p> : null}

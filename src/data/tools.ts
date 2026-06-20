@@ -38,6 +38,21 @@ export const categories: ToolCategory[] = [
   'Documentation',
 ];
 
+export const categoryLabels: Record<ToolCategory, string> = {
+  Export: '書き出し',
+  Convert: '変換',
+  QA: '品質チェック',
+  Manage: '管理',
+  Review: 'レビュー',
+  Share: '共有',
+  VR: 'VR確認',
+  Documentation: 'ドキュメント',
+};
+
+export function getCategoryLabel(category: ToolCategory) {
+  return categoryLabels[category];
+}
+
 export const availabilityLabels: Record<ToolAvailability, string> = {
   available: '利用可能',
   mvp: '基本機能版',

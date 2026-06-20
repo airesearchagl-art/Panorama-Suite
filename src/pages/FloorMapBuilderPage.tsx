@@ -311,6 +311,9 @@ function FloorMapBuilderPage() {
           <p className="lead">
             平面図画像の上に360°パノラマの撮影位置を配置し、平面図ピン情報（floorMaps）として保存します。
           </p>
+          <p className="lead">
+            案件パッケージ作成で出力した案件データファイル（project.json / updated-project.json）を読み込むと、パノラマ一覧を使ってピン配置できます。
+          </p>
         </div>
         <div className="qaActions">
           <button type="button" className="button buttonPrimary" onClick={exportFloorMapJson} disabled={activeFloorMaps.length === 0}>

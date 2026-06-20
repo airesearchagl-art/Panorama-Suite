@@ -3,10 +3,10 @@ import { publicUrls } from '../data/publicInfo';
 
 function DocsPage() {
   return (
-    <AppFrame toolName="Documentation" status="Manual">
+    <AppFrame toolName="使い方ガイド" status="ガイド">
       <section className="qaHero workspaceHero">
         <div>
-          <p className="eyebrow">Manual / Documentation</p>
+          <p className="eyebrow">使い方ガイド / ドキュメント</p>
           <h1>Panorama Suite Manual</h1>
           <p className="lead">Panorama Suite の概要、公開URL、ツールの役割、基本フロー、セキュリティ方針をまとめます。</p>
         </div>
@@ -17,10 +17,10 @@ function DocsPage() {
       </section>
 
       <section className="dashboardGrid">
-        <article className="metricCard"><span>Version</span><strong>v0.1.0</strong></article>
+        <article className="metricCard"><span>バージョン</span><strong>v0.1.0</strong></article>
         <article className="metricCard"><span>基本機能版</span><strong>4</strong></article>
-        <article className="metricCard successMetric"><span>Processing</span><strong>Local</strong></article>
-        <article className="metricCard"><span>Release</span><strong>Vercel</strong></article>
+        <article className="metricCard successMetric"><span>処理方式</span><strong>ローカル</strong></article>
+        <article className="metricCard"><span>公開先</span><strong>Vercel</strong></article>
       </section>
 
       <section className="docGrid">
@@ -70,7 +70,7 @@ function DocsPage() {
           <h2>検索・絞り込み</h2>
           <ul className="docList">
             <li>キーワード検索はツール名、説明、カテゴリ、状態ラベルを対象にします。</li>
-            <li>カテゴリは Export / Convert / QA / Manage / Review / Share / VR / Documentation で絞り込めます。</li>
+            <li>カテゴリは 書き出し / 変換 / 品質チェック / 管理 / レビュー / 共有 / VR確認 / ドキュメント で絞り込めます。</li>
             <li>状態は 利用可能 / 基本機能版 / 外部ツール / 開発中 / 構想中 / 将来予定 で絞り込めます。</li>
             <li>カテゴリと状態は同時に指定できます。0件の場合はEmpty Stateを表示します。</li>
           </ul>
@@ -136,19 +136,22 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
-          <p className="sectionKicker">Workflow</p>
+          <p className="sectionKicker">作業フロー</p>
           <h2>基本的な利用フロー</h2>
           <ol className="docList">
+            <li>パノラマ品質チェックで画像のサイズ、比率、名前を確認する。</li>
             <li>パノラマ画像変換で形式と解像度を整える。</li>
-            <li>QAで初期品質を確認する。</li>
             <li>案件パッケージ作成で案件情報、シーンごとの管理情報、画像、品質チェック結果をZIP化する。</li>
             <li>平面図ピン配置で平面図に撮影位置ピンを配置する。</li>
+            <li>更新済み案件データを書き出す。</li>
+            <li>案件パッケージ作成で再読み込みする。</li>
+            <li>ZIPとして保存する。</li>
             <li>レビュー・共有・アーカイブへ展開する。</li>
           </ol>
         </article>
 
         <article className="infoPanel">
-          <p className="sectionKicker">Security</p>
+          <p className="sectionKicker">安全性</p>
           <h2>ローカル処理</h2>
           <p>画像処理、QA判定、ZIP生成はブラウザ内で完結します。外部API送信やクラウドアップロードは行いません。</p>
         </article>
@@ -157,10 +160,10 @@ function DocsPage() {
           <p className="sectionKicker">今後の予定</p>
           <h2>今後のロードマップ</h2>
           <ul className="docList">
-            <li>DocumentationとHelpの拡張。</li>
+            <li>ドキュメントとヘルプの拡張。</li>
             <li>案件パッケージ作成のシーンごとの管理情報編集。</li>
             <li>平面図ピン配置と案件パッケージ作成の直接連携。</li>
-            <li>QA、Converter、Packagerの直接連携。</li>
+            <li>品質チェック、画像変換、案件パッケージ作成の直接連携。</li>
           </ul>
         </article>
       </section>
