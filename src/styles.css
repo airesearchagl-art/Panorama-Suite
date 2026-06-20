@@ -799,6 +799,96 @@ h1 {
   opacity: 0.42;
 }
 
+.importPanel,
+.importedInfo,
+.missingNotice {
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.importPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  margin-top: 18px;
+  padding: 20px;
+}
+
+.importPanel h2 {
+  margin: 0 0 8px;
+  letter-spacing: 0;
+}
+
+.importPanel p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.importedInfo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 18px;
+  background: var(--line);
+}
+
+.importedInfo div {
+  min-width: 0;
+  background: var(--panel);
+  padding: 16px;
+}
+
+.importedInfo span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.importedInfo strong {
+  display: block;
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+}
+
+.missingNotice {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  border-color: #edd7ad;
+  background: #fff8eb;
+  padding: 12px;
+  color: #5f4319;
+}
+
+.missingNotice strong,
+.missingNotice span {
+  display: block;
+}
+
+.fileStateReady,
+.fileStateMissing {
+  display: inline-flex;
+  border: 1px solid currentColor;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.fileStateReady {
+  color: #176541;
+  background: #e9f5ef;
+}
+
+.fileStateMissing {
+  color: #9b2f2f;
+  background: #fae8e8;
+}
+
 .converterLayout {
   display: grid;
   grid-template-columns: 300px minmax(0, 1fr);
@@ -949,6 +1039,7 @@ h1 {
   .qaLayout,
   .packagerLayout,
   .zipPreview,
+  .importPanel,
   .converterLayout {
     grid-template-columns: 1fr;
   }
@@ -972,6 +1063,10 @@ h1 {
   .packagerFooter {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .importedInfo {
+    grid-template-columns: 1fr;
   }
 }
 

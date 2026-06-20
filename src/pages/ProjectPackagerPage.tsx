@@ -10,22 +10,34 @@ type ProjectForm = {
   description: string;
 };
 
-type RegisteredImage = {
+type FileState = '実ファイル登録済み' | 'ファイル未再登録';
+
+type PanoramaEntry = {
   id: string;
-  file: File;
+  file?: File;
   fileName: string;
+  path: string;
   fileType: string;
   fileSize: number;
   width: number;
   height: number;
+  floor: string;
+  locationName: string;
+  direction: number;
+  qaStatus: string;
+  fileState: FileState;
 };
 
-type FloorplanFile = {
+type FloorplanEntry = {
   id: string;
-  file: File;
+  file?: File;
   fileName: string;
+  path: string;
   fileType: string;
   fileSize: number;
+  level: string;
+  description: string;
+  fileState: FileState;
 };
 
 type QaStatus = 'OK' | 'Warning' | 'Error' | '';
@@ -47,15 +59,40 @@ type QaSummary = {
   error: number;
 };
 
+type ImportedProject = {
+  schemaVersion: string;
+  importedAt: string;
+  resultPath: string;
+};
+
+type ProjectJson = {
+  schemaVersion: string;
+  project: Partial<ProjectForm> & {
+    createdAt?: string;
+    updatedAt?: string;
+  };
+  panoramas: Array<Partial<PanoramaEntry>>;
+  floorplans: Array<Partial<FloorplanEntry>>;
+  qa?: {
+    resultPath?: string;
+    summary?: Partial<QaSummary>;
+  };
+};
+
 const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'webp']);
+const emptyQaSummary: QaSummary = { total: 0, ok: 0, warning: 0, error: 0 };
 
 function getExtension(fileName: string) {
   const lastDot = fileName.lastIndexOf('.');
   return lastDot >= 0 ? fileName.slice(lastDot + 1).toLowerCase() : '';
 }
 
-function createId(file: File) {
+function createIdFromFile(file: File) {
   return `${file.name}-${file.lastModified}-${file.size}`;
+}
+
+function createIdFromName(prefix: string, fileName: string, index: number) {
+  return `${prefix}-${String(index + 1).padStart(3, '0')}-${fileName}`;
 }
 
 function sanitizeFileName(value: string) {
@@ -68,7 +105,42 @@ function sanitizeFileName(value: string) {
     .toLowerCase();
 }
 
-function loadImageMeta(file: File): Promise<RegisteredImage> {
+function normalizeQaSummary(summary?: Partial<QaSummary>): QaSummary {
+  return {
+    total: Number(summary?.total ?? 0),
+    ok: Number(summary?.ok ?? 0),
+    warning: Number(summary?.warning ?? 0),
+    error: Number(summary?.error ?? 0),
+  };
+}
+
+function validateProjectJson(value: unknown): ProjectJson {
+  const candidate = value as Partial<ProjectJson>;
+
+  if (!candidate || typeof candidate !== 'object') {
+    throw new Error('project.json の形式が不正です。');
+  }
+
+  if (typeof candidate.schemaVersion !== 'string' || candidate.schemaVersion.length === 0) {
+    throw new Error('schemaVersion が存在しません。');
+  }
+
+  if (!candidate.project || typeof candidate.project !== 'object') {
+    throw new Error('project が存在しません。');
+  }
+
+  if (!Array.isArray(candidate.panoramas)) {
+    throw new Error('panoramas が配列ではありません。');
+  }
+
+  if (!Array.isArray(candidate.floorplans)) {
+    throw new Error('floorplans が配列ではありません。');
+  }
+
+  return candidate as ProjectJson;
+}
+
+function loadImageMeta(file: File): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const image = new Image();
@@ -76,11 +148,6 @@ function loadImageMeta(file: File): Promise<RegisteredImage> {
     image.onload = () => {
       URL.revokeObjectURL(url);
       resolve({
-        id: createId(file),
-        file,
-        fileName: file.name,
-        fileType: getExtension(file.name),
-        fileSize: file.size,
         width: image.naturalWidth,
         height: image.naturalHeight,
       });
@@ -128,7 +195,7 @@ function summarizeQa(rows: QaResultRow[]): QaSummary {
       warning: summary.warning + (row.status === 'Warning' ? 1 : 0),
       error: summary.error + (row.status === 'Error' ? 1 : 0),
     }),
-    { total: 0, ok: 0, warning: 0, error: 0 },
+    emptyQaSummary,
   );
 }
 
@@ -149,15 +216,19 @@ function ProjectPackagerPage() {
     purpose: '',
     description: '',
   });
-  const [panoramas, setPanoramas] = useState<RegisteredImage[]>([]);
-  const [floorplans, setFloorplans] = useState<FloorplanFile[]>([]);
+  const [panoramas, setPanoramas] = useState<PanoramaEntry[]>([]);
+  const [floorplans, setFloorplans] = useState<FloorplanEntry[]>([]);
   const [qaRows, setQaRows] = useState<QaResultRow[]>([]);
+  const [qaSummary, setQaSummary] = useState<QaSummary>(emptyQaSummary);
   const [qaFile, setQaFile] = useState<File | null>(null);
+  const [qaResultPath, setQaResultPath] = useState('');
+  const [importedProject, setImportedProject] = useState<ImportedProject | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
   const [isPackaging, setIsPackaging] = useState(false);
 
-  const qaSummary = useMemo(() => summarizeQa(qaRows), [qaRows]);
   const qaByFileName = useMemo(() => new Map(qaRows.map((row) => [row.fileName, row.status ?? ''])), [qaRows]);
+  const missingPanoramas = panoramas.filter((panorama) => !panorama.file);
+  const missingFloorplans = floorplans.filter((floorplan) => !floorplan.file);
   const safeProjectName = sanitizeFileName(form.projectName);
   const canExport = form.projectName.trim().length > 0 && !isPackaging;
 
@@ -173,18 +244,52 @@ function ProjectPackagerPage() {
     const files = Array.from(fileList);
     const validFiles = files.filter((file) => imageExtensions.has(getExtension(file.name)));
     const invalidFiles = files.filter((file) => !imageExtensions.has(getExtension(file.name)));
-    const nextMessages = invalidFiles.map((file) => `${file.name}: 非対応形式です。jpg、jpeg、png、webp を使用してください。`);
+    const loaded = await Promise.allSettled(
+      validFiles.map(async (file) => ({
+        file,
+        meta: await loadImageMeta(file),
+      })),
+    );
 
-    const loaded = await Promise.allSettled(validFiles.map((file) => loadImageMeta(file)));
     const accepted = loaded
-      .filter((result): result is PromiseFulfilledResult<RegisteredImage> => result.status === 'fulfilled')
+      .filter((result): result is PromiseFulfilledResult<{ file: File; meta: { width: number; height: number } }> => result.status === 'fulfilled')
       .map((result) => result.value);
     const failed = loaded
       .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
       .map((result) => result.reason instanceof Error ? result.reason.message : '画像を読み込めません。');
 
-    setPanoramas((current) => [...current, ...accepted]);
-    setMessages([...nextMessages, ...failed]);
+    setPanoramas((current) => {
+      const next = [...current];
+      accepted.forEach(({ file, meta }) => {
+        const existingIndex = next.findIndex((panorama) => panorama.fileName === file.name);
+        const entry: PanoramaEntry = {
+          id: existingIndex >= 0 ? next[existingIndex].id : createIdFromFile(file),
+          file,
+          fileName: file.name,
+          path: `panoramas/${file.name}`,
+          fileType: getExtension(file.name),
+          fileSize: file.size,
+          width: meta.width,
+          height: meta.height,
+          floor: existingIndex >= 0 ? next[existingIndex].floor : '',
+          locationName: existingIndex >= 0 ? next[existingIndex].locationName : '',
+          direction: existingIndex >= 0 ? next[existingIndex].direction : 0,
+          qaStatus: qaByFileName.get(file.name) ?? (existingIndex >= 0 ? next[existingIndex].qaStatus : ''),
+          fileState: '実ファイル登録済み',
+        };
+
+        if (existingIndex >= 0) {
+          next[existingIndex] = entry;
+        } else {
+          next.push(entry);
+        }
+      });
+      return next;
+    });
+    setMessages([
+      ...invalidFiles.map((file) => `${file.name}: 非対応形式です。jpg、jpeg、png、webp を使用してください。`),
+      ...failed,
+    ]);
   };
 
   const addFloorplans = (fileList: FileList | null) => {
@@ -196,16 +301,30 @@ function ProjectPackagerPage() {
     const validFiles = files.filter((file) => imageExtensions.has(getExtension(file.name)));
     const invalidFiles = files.filter((file) => !imageExtensions.has(getExtension(file.name)));
 
-    setFloorplans((current) => [
-      ...current,
-      ...validFiles.map((file) => ({
-        id: createId(file),
-        file,
-        fileName: file.name,
-        fileType: getExtension(file.name),
-        fileSize: file.size,
-      })),
-    ]);
+    setFloorplans((current) => {
+      const next = [...current];
+      validFiles.forEach((file) => {
+        const existingIndex = next.findIndex((floorplan) => floorplan.fileName === file.name);
+        const entry: FloorplanEntry = {
+          id: existingIndex >= 0 ? next[existingIndex].id : createIdFromFile(file),
+          file,
+          fileName: file.name,
+          path: `floorplans/${file.name}`,
+          fileType: getExtension(file.name),
+          fileSize: file.size,
+          level: existingIndex >= 0 ? next[existingIndex].level : '',
+          description: existingIndex >= 0 ? next[existingIndex].description : '',
+          fileState: '実ファイル登録済み',
+        };
+
+        if (existingIndex >= 0) {
+          next[existingIndex] = entry;
+        } else {
+          next.push(entry);
+        }
+      });
+      return next;
+    });
     setMessages(invalidFiles.map((file) => `${file.name}: 非対応形式です。jpg、jpeg、png、webp を使用してください。`));
   };
 
@@ -222,13 +341,90 @@ function ProjectPackagerPage() {
 
     try {
       const rows = await readQaJson(file);
+      const summary = summarizeQa(rows);
       setQaRows(rows);
+      setQaSummary(summary);
       setQaFile(file);
+      setQaResultPath(`qa/${file.name}`);
+      setPanoramas((current) =>
+        current.map((panorama) => ({
+          ...panorama,
+          qaStatus: rows.find((row) => row.fileName === panorama.fileName)?.status ?? panorama.qaStatus,
+        })),
+      );
       setMessages([`${file.name}: QA結果JSONを読み込みました。`]);
     } catch (error) {
       setQaRows([]);
+      setQaSummary(emptyQaSummary);
       setQaFile(null);
+      setQaResultPath('');
       setMessages([error instanceof Error ? error.message : 'QA結果JSONを読み込めません。']);
+    }
+  };
+
+  const importProjectJson = async (fileList: FileList | null) => {
+    const file = fileList?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (getExtension(file.name) !== 'json') {
+      setMessages([`${file.name}: project.json を指定してください。`]);
+      return;
+    }
+
+    try {
+      const parsed = validateProjectJson(JSON.parse(await file.text()) as unknown);
+      const importedSummary = normalizeQaSummary(parsed.qa?.summary);
+      setForm({
+        projectName: parsed.project.projectName ?? '',
+        clientName: parsed.project.clientName ?? '',
+        manager: parsed.project.manager ?? '',
+        purpose: parsed.project.purpose ?? '',
+        description: parsed.project.description ?? '',
+      });
+      setPanoramas(
+        parsed.panoramas.map((panorama, index) => ({
+          id: String(panorama.id ?? createIdFromName('imported-panorama', panorama.fileName ?? `panorama-${index + 1}`, index)),
+          fileName: String(panorama.fileName ?? ''),
+          path: String(panorama.path ?? `panoramas/${panorama.fileName ?? ''}`),
+          fileType: String(panorama.fileType ?? getExtension(String(panorama.fileName ?? ''))),
+          fileSize: Number(panorama.fileSize ?? 0),
+          width: Number(panorama.width ?? 0),
+          height: Number(panorama.height ?? 0),
+          floor: String(panorama.floor ?? ''),
+          locationName: String(panorama.locationName ?? ''),
+          direction: Number(panorama.direction ?? 0),
+          qaStatus: String(panorama.qaStatus ?? ''),
+          fileState: 'ファイル未再登録',
+        })),
+      );
+      setFloorplans(
+        parsed.floorplans.map((floorplan, index) => ({
+          id: String(floorplan.id ?? createIdFromName('imported-floorplan', floorplan.fileName ?? `floorplan-${index + 1}`, index)),
+          fileName: String(floorplan.fileName ?? ''),
+          path: String(floorplan.path ?? `floorplans/${floorplan.fileName ?? ''}`),
+          fileType: String(floorplan.fileType ?? getExtension(String(floorplan.fileName ?? ''))),
+          fileSize: Number(floorplan.fileSize ?? 0),
+          level: String(floorplan.level ?? ''),
+          description: String(floorplan.description ?? ''),
+          fileState: 'ファイル未再登録',
+        })),
+      );
+      setQaRows([]);
+      setQaSummary(importedSummary);
+      setQaFile(null);
+      setQaResultPath(parsed.qa?.resultPath ?? '');
+      setImportedProject({
+        schemaVersion: parsed.schemaVersion,
+        importedAt: new Date().toISOString(),
+        resultPath: parsed.qa?.resultPath ?? '',
+      });
+      setMessages([
+        `${file.name}: project.json を読み込みました。実画像ファイルは復元されないため、同名ファイルを再登録してください。`,
+      ]);
+    } catch (error) {
+      setMessages([error instanceof Error ? error.message : 'project.json を読み込めません。']);
     }
   };
 
@@ -241,32 +437,32 @@ function ProjectPackagerPage() {
         clientName: form.clientName.trim(),
         manager: form.manager.trim(),
         purpose: form.purpose.trim(),
-        createdAt: now,
+        createdAt: importedProject ? importedProject.importedAt : now,
         updatedAt: now,
         description: form.description.trim(),
       },
       panoramas: panoramas.map((panorama, index) => ({
-        id: `panorama-${String(index + 1).padStart(3, '0')}`,
+        id: panorama.id || `panorama-${String(index + 1).padStart(3, '0')}`,
         fileName: panorama.fileName,
-        path: `panoramas/${panorama.fileName}`,
+        path: panorama.path || `panoramas/${panorama.fileName}`,
         width: panorama.width,
         height: panorama.height,
         fileType: panorama.fileType,
         fileSize: panorama.fileSize,
-        floor: '',
-        locationName: '',
-        direction: 0,
-        qaStatus: qaByFileName.get(panorama.fileName) ?? '',
+        floor: panorama.floor,
+        locationName: panorama.locationName,
+        direction: panorama.direction,
+        qaStatus: qaByFileName.get(panorama.fileName) ?? panorama.qaStatus,
       })),
       floorplans: floorplans.map((floorplan, index) => ({
-        id: `floorplan-${String(index + 1).padStart(3, '0')}`,
+        id: floorplan.id || `floorplan-${String(index + 1).padStart(3, '0')}`,
         fileName: floorplan.fileName,
-        path: `floorplans/${floorplan.fileName}`,
-        level: '',
-        description: '',
+        path: floorplan.path || `floorplans/${floorplan.fileName}`,
+        level: floorplan.level,
+        description: floorplan.description,
       })),
       qa: {
-        resultPath: qaFile ? `qa/${qaFile.name}` : '',
+        resultPath: qaFile ? `qa/${qaFile.name}` : qaResultPath,
         summary: qaSummary,
       },
     };
@@ -278,18 +474,31 @@ function ProjectPackagerPage() {
     }
 
     setIsPackaging(true);
-    const warnings = panoramas.length === 0 ? ['パノラマ画像が0枚です。空のpanoramasフォルダを含めて出力します。'] : [];
+    const warnings = [
+      ...(panoramas.length === 0 ? ['パノラマ画像が0枚です。空のpanoramasフォルダを含めて出力します。'] : []),
+      ...(missingPanoramas.length > 0
+        ? [`未再登録のパノラマ ${missingPanoramas.length} 件は project.json に残りますが、ZIP内に実ファイルは含まれません。`]
+        : []),
+      ...(missingFloorplans.length > 0
+        ? [`未再登録の平面図 ${missingFloorplans.length} 件は project.json に残りますが、ZIP内に実ファイルは含まれません。`]
+        : []),
+      ...(!qaFile && qaResultPath ? ['QA結果JSONの実ファイルが未再登録のため、qaフォルダには含まれません。'] : []),
+    ];
     const zip = new JSZip();
     zip.file('project.json', JSON.stringify(buildProjectJson(), null, 2));
 
     const panoramaFolder = zip.folder('panoramas');
     panoramas.forEach((panorama) => {
-      panoramaFolder?.file(panorama.fileName, panorama.file);
+      if (panorama.file) {
+        panoramaFolder?.file(panorama.fileName, panorama.file);
+      }
     });
 
     const floorplanFolder = zip.folder('floorplans');
     floorplans.forEach((floorplan) => {
-      floorplanFolder?.file(floorplan.fileName, floorplan.file);
+      if (floorplan.file) {
+        floorplanFolder?.file(floorplan.fileName, floorplan.file);
+      }
     });
 
     const qaFolder = zip.folder('qa');
@@ -313,13 +522,40 @@ function ProjectPackagerPage() {
 
       <section className="qaHero" aria-labelledby="packager-title">
         <div>
-          <p className="eyebrow">Panorama Project Packager MVP</p>
+          <p className="eyebrow">Panorama Project Packager v0.2</p>
           <h1 id="packager-title">案件単位のZIPパッケージ作成</h1>
           <p className="lead">
-            パノラマ画像、平面図、QA結果、案件メタデータをまとめ、引継ぎ・バックアップ用のZIPをブラウザ内で生成します。
+            project.json の再読み込み、案件情報の再編集、実ファイルの再登録に対応しました。
           </p>
         </div>
       </section>
+
+      <section className="importPanel" aria-labelledby="import-title">
+        <div>
+          <h2 id="import-title">project.json 読み込み</h2>
+          <p>既存パッケージの project.json を読み込むと、案件情報・一覧・QAサマリーを復元できます。</p>
+          <p>project.json だけでは実画像ファイル本体は復元できません。同名ファイルを再登録すると一覧に紐づきます。</p>
+        </div>
+        <label className="fileUploadButton secondaryUpload">
+          project.jsonを読み込む
+          <input
+            type="file"
+            accept=".json,application/json"
+            onChange={(event) => {
+              void importProjectJson(event.target.files);
+              event.currentTarget.value = '';
+            }}
+          />
+        </label>
+      </section>
+
+      {importedProject ? (
+        <section className="importedInfo" aria-label="読み込み済みプロジェクト情報">
+          <div><span>schemaVersion</span><strong>{importedProject.schemaVersion}</strong></div>
+          <div><span>QA結果パス</span><strong>{importedProject.resultPath || '-'}</strong></div>
+          <div><span>未再登録ファイル</span><strong>{missingPanoramas.length + missingFloorplans.length}</strong></div>
+        </section>
+      ) : null}
 
       <section className="packagerLayout" aria-label="Project Packager 作業エリア">
         <form className="projectForm">
@@ -403,26 +639,37 @@ function ProjectPackagerPage() {
               </ul>
             ) : null}
 
+            {(missingPanoramas.length > 0 || missingFloorplans.length > 0) ? (
+              <div className="missingNotice">
+                <strong>実ファイル再登録が必要です。</strong>
+                <span>未再登録の項目は project.json には残りますが、ZIP内に実ファイルは含まれません。</span>
+              </div>
+            ) : null}
+
             <div className="fileTables">
               <table className="compactTable">
                 <thead>
                   <tr>
                     <th>パノラマ</th>
+                    <th>パス</th>
                     <th>解像度</th>
                     <th>QA</th>
+                    <th>状態</th>
                   </tr>
                 </thead>
                 <tbody>
                   {panoramas.length === 0 ? (
                     <tr>
-                      <td colSpan={3}>パノラマ画像が未登録です。</td>
+                      <td colSpan={5}>パノラマ画像が未登録です。</td>
                     </tr>
                   ) : (
                     panoramas.map((panorama) => (
                       <tr key={panorama.id}>
                         <td>{panorama.fileName}</td>
+                        <td>{panorama.path}</td>
                         <td>{panorama.width} x {panorama.height}</td>
-                        <td>{qaByFileName.get(panorama.fileName) || '-'}</td>
+                        <td>{qaByFileName.get(panorama.fileName) || panorama.qaStatus || '-'}</td>
+                        <td><span className={panorama.file ? 'fileStateReady' : 'fileStateMissing'}>{panorama.fileState}</span></td>
                       </tr>
                     ))
                   )}
@@ -433,21 +680,23 @@ function ProjectPackagerPage() {
                 <thead>
                   <tr>
                     <th>平面図</th>
-                    <th>形式</th>
-                    <th>サイズ</th>
+                    <th>パス</th>
+                    <th>階</th>
+                    <th>状態</th>
                   </tr>
                 </thead>
                 <tbody>
                   {floorplans.length === 0 ? (
                     <tr>
-                      <td colSpan={3}>平面図は任意です。</td>
+                      <td colSpan={4}>平面図は任意です。</td>
                     </tr>
                   ) : (
                     floorplans.map((floorplan) => (
                       <tr key={floorplan.id}>
                         <td>{floorplan.fileName}</td>
-                        <td>{floorplan.fileType}</td>
-                        <td>{Math.round(floorplan.fileSize / 1024)} KB</td>
+                        <td>{floorplan.path}</td>
+                        <td>{floorplan.level || '-'}</td>
+                        <td><span className={floorplan.file ? 'fileStateReady' : 'fileStateMissing'}>{floorplan.fileState}</span></td>
                       </tr>
                     ))
                   )}
@@ -462,9 +711,9 @@ function ProjectPackagerPage() {
               <pre>{`${safeProjectName || 'project-name'}.zip
 ├ project.json
 ├ panoramas/
-│  └ ${panoramas.length > 0 ? panoramas[0].fileName : 'scene01.jpg'}
+│  └ ${panoramas.find((panorama) => panorama.file)?.fileName ?? 'scene01.jpg'}
 ├ floorplans/
-│  └ ${floorplans.length > 0 ? floorplans[0].fileName : 'floorplan.jpg'}
+│  └ ${floorplans.find((floorplan) => floorplan.file)?.fileName ?? 'floorplan.jpg'}
 └ qa/
    └ ${qaFile ? qaFile.name : 'qa-results.json'}`}</pre>
             </div>
@@ -484,6 +733,7 @@ function ProjectPackagerPage() {
       <section className="packagerFooter">
         {form.projectName.trim().length === 0 ? <p>案件名を入力するとZIP出力できます。</p> : null}
         {panoramas.length === 0 ? <p>警告: パノラマ画像が0枚です。必要に応じて追加してください。</p> : null}
+        {(missingPanoramas.length > 0 || missingFloorplans.length > 0) ? <p>警告: 未再登録ファイルはZIPに含まれません。</p> : null}
         <button type="button" onClick={() => void exportZip()} disabled={!canExport}>
           {isPackaging ? 'ZIP生成中' : 'ZIP出力'}
         </button>
