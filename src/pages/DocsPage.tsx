@@ -64,6 +64,28 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">Portal Filter</p>
+          <h2>検索・絞り込み</h2>
+          <ul className="docList">
+            <li>キーワード検索はツール名、説明、カテゴリ、状態ラベル、availabilityを対象にします。</li>
+            <li>カテゴリは Export / Convert / QA / Manage / Review / Share / VR / Documentation で絞り込めます。</li>
+            <li>状態は Available / MVP / External / Development / Concept / Future で絞り込めます。</li>
+            <li>カテゴリと状態は同時に指定できます。0件の場合はEmpty Stateを表示します。</li>
+          </ul>
+        </article>
+
+        <article className="infoPanel">
+          <p className="sectionKicker">Notification</p>
+          <h2>Toast通知</h2>
+          <ul className="docList">
+            <li>success: 読み込み、変換、ZIP出力、ダウンロードなどが完了した状態です。</li>
+            <li>warning: 非対応形式、不足ファイル、未実装ツールなど注意が必要な状態です。</li>
+            <li>error: JSON読み込み失敗、画像変換失敗など操作が完了できなかった状態です。</li>
+            <li>info: 外部ツール遷移など、補足情報を表示します。</li>
+          </ul>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">Packager Guide</p>
           <h2>scene別メタ情報編集</h2>
           <ol className="docList">

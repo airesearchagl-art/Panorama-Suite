@@ -48,6 +48,26 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>ツールが表示されない場合</h2>
+          <p>Portalのキーワード、カテゴリ、状態フィルタが有効になっている可能性があります。表示中件数を確認し、必要に応じてリセットしてください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>フィルタを解除する方法</h2>
+          <p>Portalの「リセット」ボタンを押すと、キーワード検索、カテゴリ、状態フィルタをすべて初期状態に戻します。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>Coming Soon表示の意味</h2>
+          <p>Coming Soon、開発中、構想中、将来予定のツールはまだ利用できません。カードはグレーアウトされ、クリック操作も無効です。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>Toastが表示された場合</h2>
+          <p>右下の通知は、読み込み成功、ZIP出力完了、非対応形式、JSON読込失敗などの操作結果を示します。赤はエラー、黄は注意、緑は成功、青は案内です。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>公開URL</h2>
           <ul className="docList">
             <li>Portal: <a href={publicUrls.portal}>{publicUrls.portal}</a></li>

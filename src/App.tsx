@@ -1,7 +1,8 @@
+import { useMemo, useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import AppFrame from './components/AppFrame';
 import { ToastProvider, useToast } from './components/ToastProvider';
-import { categories, tools, type Tool, type ToolAvailability } from './data/tools';
+import { availabilityLabels, categories, tools, type Tool, type ToolAvailability, type ToolCategory } from './data/tools';
 import DesignSystemPage from './pages/DesignSystemPage';
 import DocsPage from './pages/DocsPage';
 import HelpPage from './pages/HelpPage';
@@ -23,7 +24,7 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
   const disabledReason = tool.availability === 'development' ? 'このツールは現在開発中です。' : 'このツールは現在準備中です。';
 
   const handleDisabledClick = () => {
-    notify(disabledReason);
+    notify(disabledReason, tool.availability === 'development' ? 'warning' : 'info');
   };
 
   return (
@@ -58,7 +59,7 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
             target="_blank"
             rel="noreferrer"
             className="toolLink"
-            onClick={() => notify('外部ツールを開きます。')}
+            onClick={() => notify('外部ツールを開きます。', 'info')}
           >
             開く ↗
           </a>
@@ -73,10 +74,35 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
 }
 
 function PortalPage() {
+  const [keyword, setKeyword] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<ToolCategory | 'All'>('All');
+  const [availabilityFilter, setAvailabilityFilter] = useState<ToolAvailability | 'All'>('All');
   const availableCount = tools.filter((tool) => tool.isEnabled).length;
   const mvpCount = tools.filter((tool) => tool.availability === 'mvp').length;
-  const developmentCount = tools.filter((tool) => tool.availability === 'development').length;
-  const futureCount = tools.filter((tool) => tool.availability === 'future' || tool.availability === 'concept').length;
+  const roadmapCount = tools.filter((tool) => ['development', 'concept', 'future'].includes(tool.availability)).length;
+  const availabilityOptions = Object.keys(availabilityLabels) as ToolAvailability[];
+  const filteredTools = useMemo(() => {
+    const normalizedKeyword = keyword.trim().toLowerCase();
+
+    return tools.filter((tool) => {
+      const matchesKeyword =
+        normalizedKeyword.length === 0 ||
+        [tool.name, tool.description, tool.category, tool.statusLabel, tool.availability]
+          .join(' ')
+          .toLowerCase()
+          .includes(normalizedKeyword);
+      const matchesCategory = categoryFilter === 'All' || tool.category === categoryFilter;
+      const matchesAvailability = availabilityFilter === 'All' || tool.availability === availabilityFilter;
+      return matchesKeyword && matchesCategory && matchesAvailability;
+    });
+  }, [availabilityFilter, categoryFilter, keyword]);
+  const hasActiveFilters = keyword.trim().length > 0 || categoryFilter !== 'All' || availabilityFilter !== 'All';
+
+  const resetFilters = () => {
+    setKeyword('');
+    setCategoryFilter('All');
+    setAvailabilityFilter('All');
+  };
 
   return (
     <AppFrame toolName="Portal" status="Workspace">
@@ -96,8 +122,8 @@ function PortalPage() {
         <article className="metricCard"><span>Tools</span><strong>{tools.length}</strong></article>
         <article className="metricCard successMetric"><span>Available</span><strong>{availableCount}</strong></article>
         <article className="metricCard"><span>MVP</span><strong>{mvpCount}</strong></article>
-        <article className="metricCard warningMetric"><span>Development</span><strong>{developmentCount}</strong></article>
-        <article className="metricCard"><span>Future</span><strong>{futureCount}</strong></article>
+        <article className="metricCard warningMetric"><span>Roadmap</span><strong>{roadmapCount}</strong></article>
+        <article className="metricCard"><span>Filtered</span><strong>{filteredTools.length}</strong></article>
       </section>
 
       <section className="sectionBlock" aria-labelledby="categories-title">
@@ -108,9 +134,52 @@ function PortalPage() {
           </div>
           <span className="sectionMeta">Dashboard Driven Workspace</span>
         </div>
+        <div className="filterPanel" aria-label="Portal filter">
+          <label>
+            <span>キーワード検索</span>
+            <input
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
+              placeholder="tool name / category / status"
+              type="search"
+            />
+          </label>
+          <label>
+            <span>カテゴリ</span>
+            <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value as ToolCategory | 'All')}>
+              <option value="All">All</option>
+              {categories.map((category) => (
+                <option value={category} key={category}>{category}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            <span>状態</span>
+            <select
+              value={availabilityFilter}
+              onChange={(event) => setAvailabilityFilter(event.target.value as ToolAvailability | 'All')}
+            >
+              <option value="All">All</option>
+              {availabilityOptions.map((availability) => (
+                <option value={availability} key={availability}>{availabilityLabels[availability]}</option>
+              ))}
+            </select>
+          </label>
+          <button type="button" className="button buttonSecondary" onClick={resetFilters} disabled={!hasActiveFilters}>
+            リセット
+          </button>
+          <div className="filterState" aria-live="polite">
+            <strong>表示中: {filteredTools.length} / {tools.length} tools</strong>
+            <span>Category: {categoryFilter}</span>
+            <span>Status: {availabilityFilter === 'All' ? 'All' : availabilityLabels[availabilityFilter]}</span>
+          </div>
+        </div>
         <div className="categoryStack">
           {categories.map((category) => {
-            const categoryTools = tools.filter((tool) => tool.category === category);
+            const categoryTools = filteredTools.filter((tool) => tool.category === category);
+            if (categoryTools.length === 0) {
+              return null;
+            }
             return (
               <section className="categoryBand" key={category} aria-labelledby={`${category}-title`}>
                 <div className="categoryTitle">
@@ -119,12 +188,22 @@ function PortalPage() {
                 </div>
                 <div className="toolGrid">
                   {categoryTools.map((tool) => (
-                    <ToolCard key={tool.name} tool={tool} />
+                    <ToolCard key={tool.id} tool={tool} />
                   ))}
                 </div>
               </section>
             );
           })}
+          {filteredTools.length === 0 ? (
+            <div className="emptyState filterEmpty">
+              <span>🔍</span>
+              <strong>該当するツールがありません</strong>
+              <p>フィルタ条件を変更してください。</p>
+              <button type="button" className="button buttonSecondary" onClick={resetFilters}>
+                フィルタをリセット
+              </button>
+            </div>
+          ) : null}
         </div>
       </section>
 

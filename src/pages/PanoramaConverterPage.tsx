@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import { useMemo, useRef, useState, type DragEvent } from 'react';
 import AppFrame from '../components/AppFrame';
+import { useToast } from '../components/ToastProvider';
 
 type OutputFormat = 'jpg' | 'png' | 'webp';
 type ResizeMode = 'original' | 'width' | 'preset';
@@ -171,6 +172,7 @@ function downloadBlob(blob: Blob, fileName: string) {
 }
 
 function PanoramaConverterPage() {
+  const { notify } = useToast();
   const [settings, setSettings] = useState<ConverterSettings>({
     outputFormat: 'webp',
     quality: 85,
@@ -226,6 +228,15 @@ function PanoramaConverterPage() {
       ...invalidFiles.map((file) => `${file.name}: 非対応形式です。jpg、jpeg、png、webp を使用してください。`),
       ...failedMessages,
     ]);
+    if (accepted.length > 0) {
+      notify('画像を登録しました', 'success');
+    }
+    if (invalidFiles.length > 0) {
+      notify('非対応形式のファイルを除外しました', 'warning');
+    }
+    if (failedMessages.length > 0) {
+      notify('画像登録中にエラーが発生しました', 'error');
+    }
   };
 
   const convertOne = async (image: SourceImage) => {
@@ -252,12 +263,14 @@ function PanoramaConverterPage() {
   const convertAll = async () => {
     if (!hasImages) {
       setMessages(['変換対象の画像を追加してください。']);
+      notify('変換対象の画像を追加してください', 'warning');
       return;
     }
 
     setMessages([]);
     setImages((current) => current.map((image) => ({ ...image, status: '変換中', error: '' })));
     const usedOutputNames = new Set<string>();
+    let failedCount = 0;
 
     for (const image of images) {
       try {
@@ -279,6 +292,7 @@ function PanoramaConverterPage() {
           ),
         );
       } catch (error) {
+        failedCount += 1;
         setImages((current) =>
           current.map((currentImage) =>
             currentImage.id === image.id
@@ -292,6 +306,12 @@ function PanoramaConverterPage() {
           ),
         );
       }
+    }
+
+    if (failedCount > 0) {
+      notify('変換エラーが発生しました', 'error');
+    } else {
+      notify('変換が完了しました', 'success');
     }
   };
 
@@ -308,6 +328,7 @@ function PanoramaConverterPage() {
     });
     const blob = await zip.generateAsync({ type: 'blob' });
     downloadBlob(blob, 'panorama-converted.zip');
+    notify('変換済みZIPを書き出しました', 'success');
   };
 
   const clearImages = () => {
@@ -503,6 +524,7 @@ function PanoramaConverterPage() {
                           onClick={() => {
                             if (image.outputBlob) {
                               downloadBlob(image.outputBlob, image.outputFileName);
+                              notify('変換済み画像をダウンロードしました', 'success');
                             }
                           }}
                         >

@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import { useMemo, useState } from 'react';
 import AppFrame from '../components/AppFrame';
+import { useToast } from '../components/ToastProvider';
 
 type ProjectForm = {
   projectName: string;
@@ -227,6 +228,7 @@ function downloadBlob(blob: Blob, fileName: string) {
 }
 
 function ProjectPackagerPage() {
+  const { notify } = useToast();
   const [form, setForm] = useState<ProjectForm>({
     projectName: '',
     clientName: '',
@@ -322,6 +324,15 @@ function ProjectPackagerPage() {
       ...invalidFiles.map((file) => `${file.name}: 非対応形式です。jpg、jpeg、png、webp を使用してください。`),
       ...failed,
     ]);
+    if (accepted.length > 0) {
+      notify('パノラマ画像を登録しました', 'success');
+    }
+    if (invalidFiles.length > 0) {
+      notify('非対応形式のファイルを除外しました', 'warning');
+    }
+    if (failed.length > 0) {
+      notify('パノラマ画像の読み込みに失敗しました', 'error');
+    }
   };
 
   const addFloorplans = (fileList: FileList | null) => {
@@ -358,6 +369,12 @@ function ProjectPackagerPage() {
       return next;
     });
     setMessages(invalidFiles.map((file) => `${file.name}: 非対応形式です。jpg、jpeg、png、webp を使用してください。`));
+    if (validFiles.length > 0) {
+      notify('平面図を登録しました', 'success');
+    }
+    if (invalidFiles.length > 0) {
+      notify('非対応形式のファイルを除外しました', 'warning');
+    }
   };
 
   const addQaJson = async (fileList: FileList | null) => {
@@ -368,6 +385,7 @@ function ProjectPackagerPage() {
 
     if (getExtension(file.name) !== 'json') {
       setMessages([`${file.name}: QA結果はJSONファイルを指定してください。`]);
+      notify('QA結果JSONの読み込みに失敗しました', 'error');
       return;
     }
 
@@ -385,12 +403,14 @@ function ProjectPackagerPage() {
         })),
       );
       setMessages([`${file.name}: QA結果JSONを読み込みました。`]);
+      notify('QA JSONを読み込みました', 'success');
     } catch (error) {
       setQaRows([]);
       setQaSummary(emptyQaSummary);
       setQaFile(null);
       setQaResultPath('');
       setMessages([error instanceof Error ? error.message : 'QA結果JSONを読み込めません。']);
+      notify('QA結果JSONの読み込みに失敗しました', 'error');
     }
   };
 
@@ -402,6 +422,7 @@ function ProjectPackagerPage() {
 
     if (getExtension(file.name) !== 'json') {
       setMessages([`${file.name}: project.json を指定してください。`]);
+      notify('project.jsonの読み込みに失敗しました', 'error');
       return;
     }
 
@@ -458,8 +479,10 @@ function ProjectPackagerPage() {
       setMessages([
         `${file.name}: project.json を読み込みました。実画像ファイルは復元されないため、同名ファイルを再登録してください。`,
       ]);
+      notify('project.jsonを読み込みました', 'success');
     } catch (error) {
       setMessages([error instanceof Error ? error.message : 'project.json を読み込めません。']);
+      notify('project.jsonの読み込みに失敗しました', 'error');
     }
   };
 
@@ -548,6 +571,11 @@ function ProjectPackagerPage() {
     downloadBlob(blob, `${safeProjectName || 'panorama-project'}.zip`);
     setMessages(warnings.length > 0 ? warnings : ['ZIPを書き出しました。']);
     setIsPackaging(false);
+    if (warnings.length > 0) {
+      notify('未再登録ファイルがあります。ZIPには実ファイルは含まれません', 'warning');
+    } else {
+      notify('ZIPを書き出しました', 'success');
+    }
   };
 
   return (

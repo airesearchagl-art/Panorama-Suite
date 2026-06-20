@@ -57,7 +57,6 @@ function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: A
             <span className="sideLabel">Coming Soon</span>
             {tools
               .filter((tool) => !tool.isEnabled)
-              .slice(0, 5)
               .map((tool) => (
                 <span className="sideDisabledLink" aria-disabled="true" title={tool.statusLabel} key={tool.id}>
                   {tool.name}

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import AppFrame from '../components/AppFrame';
+import { useToast } from '../components/ToastProvider';
 
 type QaStatus = 'OK' | 'Warning' | 'Error';
 
@@ -129,6 +130,7 @@ function escapeCsvValue(value: string | number | null) {
 }
 
 function PanoramaQaPage() {
+  const { notify } = useToast();
   const [results, setResults] = useState<QaResult[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -167,6 +169,16 @@ function PanoramaQaPage() {
     );
     setResults((current) => [...current, ...analyzedResults]);
     setIsAnalyzing(false);
+
+    const unsupportedCount = files.filter((file) => !isSupportedFile(file)).length;
+    const errorCount = analyzedResults.filter((result) => result.status === 'Error').length;
+    if (unsupportedCount > 0) {
+      notify('非対応形式のファイルを除外しました', 'warning');
+    } else if (errorCount > 0) {
+      notify('画像読み込み中にエラーが発生しました', 'error');
+    } else {
+      notify('画像を読み込みました', 'success');
+    }
   };
 
   const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
@@ -189,6 +201,7 @@ function PanoramaQaPage() {
       JSON.stringify(exportRows, null, 2),
       'application/json;charset=utf-8',
     );
+    notify('QA結果JSONを書き出しました', 'success');
   };
 
   const exportCsv = () => {
@@ -207,6 +220,7 @@ function PanoramaQaPage() {
         .join(','),
     );
     downloadTextFile('panorama-qa-results.csv', [header.join(','), ...rows].join('\n'), 'text/csv;charset=utf-8');
+    notify('QA結果CSVを書き出しました', 'success');
   };
 
   const passRate = summary.total > 0 ? Math.round((summary.OK / summary.total) * 100) : 0;

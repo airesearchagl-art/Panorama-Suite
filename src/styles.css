@@ -312,6 +312,26 @@ button {
   font-weight: 800;
 }
 
+.toastsuccess {
+  border-color: rgba(16, 185, 129, 0.7);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.18);
+}
+
+.toastwarning {
+  border-color: rgba(245, 158, 11, 0.72);
+  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.18);
+}
+
+.toasterror {
+  border-color: rgba(239, 68, 68, 0.72);
+  box-shadow: 0 12px 28px rgba(239, 68, 68, 0.18);
+}
+
+.toastinfo {
+  border-color: rgba(79, 124, 255, 0.72);
+  box-shadow: 0 12px 28px rgba(79, 124, 255, 0.18);
+}
+
 .dashboardGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -375,6 +395,13 @@ button {
 .smallEmpty {
   min-height: 92px;
   padding: 12px;
+}
+
+.filterEmpty {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-card);
 }
 
 .securityPanel {
@@ -556,6 +583,62 @@ h1 {
   margin: 6px 0 0;
   font-size: clamp(1.5rem, 3vw, 2.15rem);
   letter-spacing: 0;
+}
+
+.filterPanel {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.4fr) minmax(150px, 0.7fr) minmax(150px, 0.7fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+}
+
+.filterPanel label {
+  display: grid;
+  gap: 7px;
+}
+
+.filterPanel label span {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.filterPanel input,
+.filterPanel select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #111827;
+  color: var(--color-text-main);
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.filterPanel input:focus,
+.filterPanel select:focus {
+  border-color: var(--color-accent);
+  outline: 2px solid rgba(79, 124, 255, 0.22);
+}
+
+.filterState {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.filterState strong {
+  color: var(--color-text-main);
 }
 
 .featuredGrid,
@@ -1586,7 +1669,8 @@ h1 {
 
   .dashboardGrid,
   .splitSections,
-  .docGrid {
+  .docGrid,
+  .filterPanel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1669,7 +1753,8 @@ h1 {
   .dashboardGrid,
   .splitSections,
   .docGrid,
-  .paletteGrid {
+  .paletteGrid,
+  .filterPanel {
     grid-template-columns: 1fr;
   }
 

@@ -1,17 +1,29 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 
 type ToastContextValue = {
-  notify: (message: string) => void;
+  notify: (message: string, type?: ToastType) => void;
+};
+
+export type ToastType = 'success' | 'warning' | 'error' | 'info';
+
+type ToastMessage = {
+  message: string;
+  type: ToastType;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [message, setMessage] = useState('');
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const timeoutRef = useRef<number | null>(null);
 
-  const notify = useCallback((nextMessage: string) => {
-    setMessage(nextMessage);
-    window.setTimeout(() => setMessage(''), 2600);
+  const notify = useCallback((message: string, type: ToastType = 'info') => {
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+    }
+
+    setToast({ message, type });
+    timeoutRef.current = window.setTimeout(() => setToast(null), 2800);
   }, []);
 
   const value = useMemo(() => ({ notify }), [notify]);
@@ -19,9 +31,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {message ? (
-        <div className="toast" role="status" aria-live="polite">
-          {message}
+      {toast ? (
+        <div className={`toast toast${toast.type}`} role="status" aria-live="polite">
+          {toast.message}
         </div>
       ) : null}
     </ToastContext.Provider>
