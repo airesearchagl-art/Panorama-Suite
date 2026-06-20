@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import { useMemo, useRef, useState, type DragEvent } from 'react';
-import { Link } from 'react-router-dom';
+import AppFrame from '../components/AppFrame';
 
 type OutputFormat = 'jpg' | 'png' | 'webp';
 type ResizeMode = 'original' | 'width' | 'preset';
@@ -185,6 +185,7 @@ function PanoramaConverterPage() {
   const usedSourceNamesRef = useRef(new Set<string>());
 
   const convertedImages = useMemo(() => images.filter((image) => image.outputBlob), [images]);
+  const failedImages = useMemo(() => images.filter((image) => image.status === 'エラー'), [images]);
   const hasImages = images.length > 0;
   const hasConvertedImages = convertedImages.length > 0;
 
@@ -322,14 +323,8 @@ function PanoramaConverterPage() {
   };
 
   return (
-    <main className="appShell converterShell">
-      <nav className="subNav" aria-label="ページ移動">
-        <Link to="/">Portal</Link>
-        <span>/</span>
-        <span>Panorama Converter</span>
-      </nav>
-
-      <section className="qaHero" aria-labelledby="converter-title">
+    <AppFrame toolName="Panorama Converter" status="MVP公開中">
+      <section className="qaHero workspaceHero" aria-labelledby="converter-title">
         <div>
           <p className="eyebrow">Panorama Converter MVP</p>
           <h1 id="converter-title">パノラマ画像の一括変換</h1>
@@ -338,16 +333,23 @@ function PanoramaConverterPage() {
           </p>
         </div>
         <div className="qaActions">
-          <button type="button" onClick={() => void convertAll()} disabled={!hasImages}>
-            変換実行
+          <button type="button" className="button buttonPrimary" onClick={() => void convertAll()} disabled={!hasImages}>
+            🖼 画像変換
           </button>
-          <button type="button" onClick={() => void downloadZip()} disabled={!hasConvertedImages}>
-            ZIP出力
+          <button type="button" className="button buttonPrimary" onClick={() => void downloadZip()} disabled={!hasConvertedImages}>
+            📦 ZIP出力
           </button>
-          <button type="button" className="secondaryButton" onClick={clearImages} disabled={!hasImages}>
-            クリア
+          <button type="button" className="button buttonSecondary" onClick={clearImages} disabled={!hasImages}>
+            🔄 クリア
           </button>
         </div>
+      </section>
+
+      <section className="dashboardGrid" aria-label="Panorama Converter Dashboard">
+        <article className="metricCard"><span>Input Images</span><strong>{images.length}</strong></article>
+        <article className="metricCard successMetric"><span>Converted</span><strong>{convertedImages.length}</strong></article>
+        <article className="metricCard errorMetric"><span>Failed</span><strong>{failedImages.length}</strong></article>
+        <article className="metricCard"><span>Output Format</span><strong>{settings.outputFormat}</strong></article>
       </section>
 
       <section className="converterLayout" aria-label="Panorama Converter 作業エリア">
@@ -474,7 +476,11 @@ function PanoramaConverterPage() {
                 {images.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="emptyCell">
-                      まだ画像が読み込まれていません。
+                      <div className="emptyState">
+                        <span>📂</span>
+                        <strong>画像がありません</strong>
+                        <p>変換する画像をドラッグ＆ドロップ、またはファイル選択してください。</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -500,7 +506,7 @@ function PanoramaConverterPage() {
                             }
                           }}
                         >
-                          保存
+                          💾 保存
                         </button>
                       </td>
                     </tr>
@@ -511,7 +517,7 @@ function PanoramaConverterPage() {
           </div>
         </div>
       </section>
-    </main>
+    </AppFrame>
   );
 }
 

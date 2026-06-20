@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from 'react-router-dom';
-import { categories, featuredTools, tools, type Tool, type ToolStatus } from './data/tools';
+import AppFrame from './components/AppFrame';
+import { categories, tools, type Tool, type ToolStatus } from './data/tools';
 import PanoramaConverterPage from './pages/PanoramaConverterPage';
 import PanoramaQaPage from './pages/PanoramaQaPage';
 import ProjectPackagerPage from './pages/ProjectPackagerPage';
@@ -47,51 +48,37 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
 
 function PortalPage() {
   const liveCount = tools.filter((tool) => tool.status === '公開中' || tool.status === 'MVP公開中').length;
+  const mvpCount = tools.filter((tool) => tool.status === 'MVP公開中').length;
   const plannedCount = tools.filter((tool) => tool.status !== '公開中' && tool.status !== 'MVP公開中').length;
 
   return (
-    <main className="appShell">
-      <section className="heroSection" aria-labelledby="page-title">
-        <div className="heroCopy">
-          <p className="eyebrow">建築設計・施工管理向け 360° Panorama Operations</p>
+    <AppFrame toolName="Portal" status="Workspace">
+      <section className="heroSection workspaceHero" aria-labelledby="page-title">
+        <div>
+          <p className="eyebrow">Information First / Workspace Style</p>
           <h1 id="page-title">Panorama Suite Portal</h1>
-          <p className="lead">
-            作成、変換、品質確認、案件管理、レビュー、共有、VR確認までをつなぐ統合ポータル。
-            既存公開ツールと今後の開発予定を同じ業務導線上に整理します。
-          </p>
+          <p className="lead">360°パノラマ業務を、品質確認、変換、案件管理、共有、レビューへつなぐ作業空間です。</p>
         </div>
-        <dl className="metricsPanel" aria-label="ポータル概要">
-          <div>
-            <dt>カテゴリ</dt>
-            <dd>{categories.length}</dd>
-          </div>
-          <div>
-            <dt>公開中</dt>
-            <dd>{liveCount}</dd>
-          </div>
-          <div>
-            <dt>計画中</dt>
-            <dd>{plannedCount}</dd>
-          </div>
-        </dl>
+        <div className="securityPanel">
+          <strong>🔒 Local Processing</strong>
+          <span>画像処理はブラウザ内で完結。外部API送信、クラウドアップロードは行いません。</span>
+        </div>
       </section>
 
-      <section className="sectionBlock" aria-labelledby="featured-title">
-        <div className="sectionHeading">
-          <p className="sectionKicker">Priority</p>
-          <h2 id="featured-title">最優先ツール</h2>
-        </div>
-        <div className="featuredGrid">
-          {featuredTools.map((tool) => (
-            <ToolCard key={tool.name} tool={tool} featured />
-          ))}
-        </div>
+      <section className="dashboardGrid" aria-label="Portal Dashboard">
+        <article className="metricCard"><span>Tools</span><strong>{tools.length}</strong></article>
+        <article className="metricCard"><span>Released</span><strong>{liveCount}</strong></article>
+        <article className="metricCard"><span>MVP</span><strong>{mvpCount}</strong></article>
+        <article className="metricCard"><span>Planned</span><strong>{plannedCount}</strong></article>
       </section>
 
       <section className="sectionBlock" aria-labelledby="categories-title">
         <div className="sectionHeading">
-          <p className="sectionKicker">Tool Map</p>
-          <h2 id="categories-title">カテゴリ別ツール一覧</h2>
+          <div>
+            <p className="sectionKicker">Tool Grid</p>
+            <h2 id="categories-title">ツール一覧</h2>
+          </div>
+          <span className="sectionMeta">Dashboard Driven Workspace</span>
         </div>
         <div className="categoryStack">
           {categories.map((category) => {
@@ -112,7 +99,28 @@ function PortalPage() {
           })}
         </div>
       </section>
-    </main>
+
+      <section className="sectionBlock splitSections" id="documentation">
+        <article className="infoPanel">
+          <p className="sectionKicker">Recent Updates</p>
+          <div className="emptyState smallEmpty">
+            <span>📋</span>
+            <strong>更新履歴はまだありません</strong>
+            <p>リリースノートと変更履歴を次フェーズで整理します。</p>
+          </div>
+        </article>
+        <article className="infoPanel">
+          <p className="sectionKicker">Documentation</p>
+          <h2>Manual / Help</h2>
+          <p>READMEを基点に、各ツールの操作ガイドとFAQを整備します。</p>
+        </article>
+        <article className="infoPanel">
+          <p className="sectionKicker">Security</p>
+          <h2>Local Processing</h2>
+          <p>画像処理、ZIP生成、QA判定はブラウザ内で完結します。</p>
+        </article>
+      </section>
+    </AppFrame>
   );
 }
 

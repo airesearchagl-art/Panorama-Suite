@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import AppFrame from '../components/AppFrame';
 
 type ProjectForm = {
   projectName: string;
@@ -513,14 +513,8 @@ function ProjectPackagerPage() {
   };
 
   return (
-    <main className="appShell packagerShell">
-      <nav className="subNav" aria-label="ページ移動">
-        <Link to="/">Portal</Link>
-        <span>/</span>
-        <span>Project Packager</span>
-      </nav>
-
-      <section className="qaHero" aria-labelledby="packager-title">
+    <AppFrame toolName="Project Packager" status="v0.2">
+      <section className="qaHero workspaceHero" aria-labelledby="packager-title">
         <div>
           <p className="eyebrow">Panorama Project Packager v0.2</p>
           <h1 id="packager-title">案件単位のZIPパッケージ作成</h1>
@@ -530,6 +524,13 @@ function ProjectPackagerPage() {
         </div>
       </section>
 
+      <section className="dashboardGrid" aria-label="Project Packager Dashboard">
+        <article className="metricCard"><span>Panoramas</span><strong>{panoramas.length}</strong></article>
+        <article className="metricCard"><span>Floorplans</span><strong>{floorplans.length}</strong></article>
+        <article className="metricCard warningMetric"><span>Missing Files</span><strong>{missingPanoramas.length + missingFloorplans.length}</strong></article>
+        <article className="metricCard"><span>QA Status</span><strong>{qaSummary.total > 0 ? `${qaSummary.ok}/${qaSummary.total}` : '-'}</strong></article>
+      </section>
+
       <section className="importPanel" aria-labelledby="import-title">
         <div>
           <h2 id="import-title">project.json 読み込み</h2>
@@ -537,7 +538,7 @@ function ProjectPackagerPage() {
           <p>project.json だけでは実画像ファイル本体は復元できません。同名ファイルを再登録すると一覧に紐づきます。</p>
         </div>
         <label className="fileUploadButton secondaryUpload">
-          project.jsonを読み込む
+          📁 project.jsonを読み込む
           <input
             type="file"
             accept=".json,application/json"
@@ -595,7 +596,7 @@ function ProjectPackagerPage() {
             </div>
             <div className="uploadGrid">
               <label className="fileUploadButton">
-                パノラマ画像を追加
+                📁 パノラマ画像を追加
                 <input
                   type="file"
                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
@@ -607,7 +608,7 @@ function ProjectPackagerPage() {
                 />
               </label>
               <label className="fileUploadButton">
-                平面図画像を追加
+                📁 平面図画像を追加
                 <input
                   type="file"
                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
@@ -619,7 +620,7 @@ function ProjectPackagerPage() {
                 />
               </label>
               <label className="fileUploadButton secondaryUpload">
-                QA結果JSONを読み込む
+                📁 QA結果JSONを読み込む
                 <input
                   type="file"
                   accept=".json,application/json"
@@ -660,7 +661,13 @@ function ProjectPackagerPage() {
                 <tbody>
                   {panoramas.length === 0 ? (
                     <tr>
-                      <td colSpan={5}>パノラマ画像が未登録です。</td>
+                      <td colSpan={5}>
+                        <div className="emptyState smallEmpty">
+                          <span>📂</span>
+                          <strong>パノラマ画像がありません</strong>
+                          <p>画像を追加、または project.json を読み込んでメタ情報を復元してください。</p>
+                        </div>
+                      </td>
                     </tr>
                   ) : (
                     panoramas.map((panorama) => (
@@ -688,7 +695,13 @@ function ProjectPackagerPage() {
                 <tbody>
                   {floorplans.length === 0 ? (
                     <tr>
-                      <td colSpan={4}>平面図は任意です。</td>
+                      <td colSpan={4}>
+                        <div className="emptyState smallEmpty">
+                          <span>🗺</span>
+                          <strong>平面図は未登録です</strong>
+                          <p>必要に応じて平面図画像を追加してください。</p>
+                        </div>
+                      </td>
                     </tr>
                   ) : (
                     floorplans.map((floorplan) => (
@@ -735,10 +748,10 @@ function ProjectPackagerPage() {
         {panoramas.length === 0 ? <p>警告: パノラマ画像が0枚です。必要に応じて追加してください。</p> : null}
         {(missingPanoramas.length > 0 || missingFloorplans.length > 0) ? <p>警告: 未再登録ファイルはZIPに含まれません。</p> : null}
         <button type="button" onClick={() => void exportZip()} disabled={!canExport}>
-          {isPackaging ? 'ZIP生成中' : 'ZIP出力'}
+          {isPackaging ? '📦 ZIP生成中' : '📦 ZIP出力'}
         </button>
       </section>
-    </main>
+    </AppFrame>
   );
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
-import { Link } from 'react-router-dom';
+import AppFrame from '../components/AppFrame';
 
 type QaStatus = 'OK' | 'Warning' | 'Error';
 
@@ -209,15 +209,11 @@ function PanoramaQaPage() {
     downloadTextFile('panorama-qa-results.csv', [header.join(','), ...rows].join('\n'), 'text/csv;charset=utf-8');
   };
 
-  return (
-    <main className="appShell qaShell">
-      <nav className="subNav" aria-label="ページ移動">
-        <Link to="/">Portal</Link>
-        <span>/</span>
-        <span>Panorama QA</span>
-      </nav>
+  const passRate = summary.total > 0 ? Math.round((summary.OK / summary.total) * 100) : 0;
 
-      <section className="qaHero" aria-labelledby="qa-title">
+  return (
+    <AppFrame toolName="Panorama QA" status="MVP">
+      <section className="qaHero workspaceHero" aria-labelledby="qa-title">
         <div>
           <p className="eyebrow">Panorama QA v0.1</p>
           <h1 id="qa-title">360°パノラマ初期品質チェック</h1>
@@ -226,20 +222,27 @@ function PanoramaQaPage() {
           </p>
         </div>
         <div className="qaActions">
-          <button type="button" onClick={exportJson} disabled={results.length === 0}>
-            JSON出力
+          <button type="button" className="button buttonPrimary" onClick={exportJson} disabled={results.length === 0}>
+            💾 JSON出力
           </button>
-          <button type="button" onClick={exportCsv} disabled={results.length === 0}>
-            CSV出力
+          <button type="button" className="button buttonPrimary" onClick={exportCsv} disabled={results.length === 0}>
+            💾 CSV出力
           </button>
-          <button type="button" className="secondaryButton" onClick={clearResults} disabled={results.length === 0}>
-            クリア
+          <button type="button" className="button buttonSecondary" onClick={clearResults} disabled={results.length === 0}>
+            🔄 クリア
           </button>
         </div>
       </section>
 
+      <section className="dashboardGrid" aria-label="Panorama QA Dashboard">
+        <article className="metricCard"><span>Images</span><strong>{summary.total}</strong></article>
+        <article className="metricCard warningMetric"><span>Warnings</span><strong>{summary.Warning}</strong></article>
+        <article className="metricCard errorMetric"><span>Errors</span><strong>{summary.Error}</strong></article>
+        <article className="metricCard successMetric"><span>Pass Rate</span><strong>{passRate}%</strong></article>
+      </section>
+
       <section className="qaLayout" aria-label="Panorama QA 作業エリア">
-        <aside className="qaSummary" aria-label="集計">
+        <aside className="qaSummary dashboardRail" aria-label="集計">
           <div>
             <span>読み込み画像数</span>
             <strong>{summary.total}</strong>
@@ -303,7 +306,11 @@ function PanoramaQaPage() {
                 {results.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="emptyCell">
-                      まだ画像が読み込まれていません。
+                      <div className="emptyState">
+                        <span>📂</span>
+                        <strong>画像がありません</strong>
+                        <p>ドラッグ＆ドロップ、またはファイル選択でQA対象の画像を追加してください。</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -340,7 +347,7 @@ function PanoramaQaPage() {
           </div>
         </div>
       </section>
-    </main>
+    </AppFrame>
   );
 }
 
