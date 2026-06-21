@@ -9,6 +9,7 @@ import {
   projectHandoffStorageKey,
   saveReviewProjectHandoff,
 } from '../data/handoff';
+import { getSampleProjectState, type SampleProject } from '../data/sampleProject';
 
 type ProjectForm = {
   projectName: string;
@@ -332,6 +333,7 @@ function ProjectPackagerPage() {
   const [receivedUpdatedProject, setReceivedUpdatedProject] = useState<{ createdAt: string; source: string } | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
   const [isPackaging, setIsPackaging] = useState(false);
+  const [sample, setSample] = useState<SampleProject | null>(null);
 
   const qaByFileName = useMemo(() => new Map(qaRows.map((row) => [row.fileName, row.status ?? ''])), [qaRows]);
   const missingPanoramas = panoramas.filter((panorama) => !panorama.file);
@@ -521,6 +523,10 @@ function ProjectPackagerPage() {
       notify('更新済み案件データを読み込めませんでした', 'error');
     }
   }, [notify]);
+
+  useEffect(() => {
+    setSample(getSampleProjectState());
+  }, []);
 
   const addPanoramas = async (fileList: FileList | null) => {
     if (!fileList) {
@@ -897,6 +903,24 @@ function ProjectPackagerPage() {
           <li>最後にZIPとして保存する</li>
         </ol>
       </section>
+
+      {sample ? (
+        <section className="sectionBlock sampleContextPanel">
+          <div className="sectionHeading">
+            <div>
+              <p className="sectionKicker">サンプル案件</p>
+              <h2>{sample.projectName}</h2>
+            </div>
+            <span className="statusBadge statusMvp">構成確認用</span>
+          </div>
+          <p>{sample.description} 実画像は含まれないため、ZIPに含める画像は通常どおり手動で登録してください。</p>
+          <div className="dashboardGrid compactDashboard">
+            <article className="metricCard"><span>パノラマ</span><strong>{sample.summary.panoramas}</strong></article>
+            <article className="metricCard"><span>平面図</span><strong>{sample.summary.floorplans}</strong></article>
+            <article className="metricCard"><span>ピン</span><strong>{sample.summary.pins}</strong></article>
+          </div>
+        </section>
+      ) : null}
 
       <section className="dashboardGrid" aria-label="案件パッケージ作成 ダッシュボード">
         <article className="metricCard"><span>パノラマ</span><strong>{panoramas.length}</strong></article>

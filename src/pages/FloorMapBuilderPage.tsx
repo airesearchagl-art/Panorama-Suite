@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
 import { projectHandoffStorageKey, saveUpdatedProjectHandoff } from '../data/handoff';
+import { getSampleProjectState, type SampleProject } from '../data/sampleProject';
 
 type ProjectInfo = Record<string, unknown>;
 
@@ -188,6 +189,7 @@ function FloorMapBuilderPage() {
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
   const [handoffMessage, setHandoffMessage] = useState('');
+  const [sample, setSample] = useState<SampleProject | null>(null);
 
   const panoramas = sourceProject?.panoramas ?? [];
   const assignedPanoramaIds = pins.map((pin) => pin.panoramaId).filter(Boolean);
@@ -315,6 +317,10 @@ function FloorMapBuilderPage() {
       notify('受け渡しデータを読み込めませんでした', 'error');
     }
   }, [notify]);
+
+  useEffect(() => {
+    setSample(getSampleProjectState());
+  }, []);
 
   const handleFloorMapUpload = (fileList: FileList | null) => {
     const file = fileList?.[0];
@@ -510,6 +516,36 @@ function FloorMapBuilderPage() {
           <li>更新済み案件データを書き出す</li>
         </ol>
       </section>
+
+      {sample ? (
+        <section className="sectionBlock sampleContextPanel">
+          <div className="sectionHeading">
+            <div>
+              <p className="sectionKicker">サンプル案件</p>
+              <h2>プレースホルダー平面図とピン</h2>
+            </div>
+            <span className="statusBadge statusMvp">実画像なしのデモデータ</span>
+          </div>
+          <div className="sampleFloorMapPreview">
+            <div className="sampleFloorMapCanvas">
+              {sample.pins.map((pin, index) => (
+                <span className="samplePin" style={{ left: `${pin.x}%`, top: `${pin.y}%` }} key={pin.id}>
+                  {index + 1}
+                </span>
+              ))}
+            </div>
+            <div className="samplePinList">
+              {sample.pins.map((pin) => (
+                <article className="sampleMiniCard" key={pin.id}>
+                  <strong>{pin.label}</strong>
+                  <span>x {pin.x}% / y {pin.y}% / {pin.direction}°</span>
+                  <span>{pin.note}</span>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="dashboardGrid" aria-label="平面図ピン配置 ダッシュボード">
         <article className="metricCard"><span>平面図</span><strong>{activeFloorMaps.length}</strong></article>

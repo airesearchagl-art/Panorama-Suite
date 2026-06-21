@@ -1,7 +1,8 @@
 import JSZip from 'jszip';
-import { useMemo, useRef, useState, type DragEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
+import { getSampleProjectState, type SampleProject } from '../data/sampleProject';
 
 type OutputFormat = 'jpg' | 'png' | 'webp';
 type ResizeMode = 'original' | 'width' | 'preset';
@@ -184,6 +185,7 @@ function PanoramaConverterPage() {
   const [images, setImages] = useState<SourceImage[]>([]);
   const [messages, setMessages] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [sample, setSample] = useState<SampleProject | null>(null);
   const usedSourceNamesRef = useRef(new Set<string>());
 
   const convertedImages = useMemo(() => images.filter((image) => image.outputBlob), [images]);
@@ -343,6 +345,10 @@ function PanoramaConverterPage() {
     void addFiles(event.dataTransfer.files);
   };
 
+  useEffect(() => {
+    setSample(getSampleProjectState());
+  }, []);
+
   return (
     <AppFrame toolName="パノラマ画像変換" status="基本機能版">
       <section className="qaHero workspaceHero" aria-labelledby="converter-title">
@@ -377,6 +383,28 @@ function PanoramaConverterPage() {
           <li>変換して個別またはZIPで保存する</li>
         </ol>
       </section>
+
+      {sample ? (
+        <section className="sectionBlock sampleContextPanel">
+          <div className="sectionHeading">
+            <div>
+              <p className="sectionKicker">サンプル案件</p>
+              <h2>{sample.projectName}</h2>
+            </div>
+            <span className="statusBadge statusMvp">実画像なしのデモデータ</span>
+          </div>
+          <p>このページでは、下記のサンプルパノラマを実ファイルとして読み込む代わりに、手元の画像を読み込んで変換操作を試してください。</p>
+          <div className="sampleListGrid">
+            {sample.panoramas.map((panorama) => (
+              <article className="sampleMiniCard" key={panorama.id}>
+                <strong>{panorama.fileName}</strong>
+                <span>{panorama.floor} / {panorama.locationName}</span>
+                <span>{panorama.note}</span>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="dashboardGrid" aria-label="パノラマ画像変換 ダッシュボード">
         <article className="metricCard"><span>入力画像</span><strong>{images.length}</strong></article>

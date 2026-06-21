@@ -3,7 +3,7 @@ import { Link, Route, Routes } from 'react-router-dom';
 import AppFrame from './components/AppFrame';
 import { ToastProvider, useToast } from './components/ToastProvider';
 import { availabilityLabels, categories, getCategoryLabel, tools, type Tool, type ToolAvailability, type ToolCategory } from './data/tools';
-import { sampleProject } from './data/sampleProject';
+import { sampleProject, saveSampleProjectState } from './data/sampleProject';
 
 const DesignSystemPage = lazy(() => import('./pages/DesignSystemPage'));
 const DocsPage = lazy(() => import('./pages/DocsPage'));
@@ -85,6 +85,7 @@ function ToolCard({ tool, featured = false }: { tool: Tool; featured?: boolean }
 }
 
 function PortalPage() {
+  const { notify } = useToast();
   const [keyword, setKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<ToolCategory | 'All'>('All');
   const [availabilityFilter, setAvailabilityFilter] = useState<ToolAvailability | 'All'>('All');
@@ -125,6 +126,11 @@ function PortalPage() {
     setShowTutorialBanner(false);
   };
 
+  const loadSampleProject = () => {
+    saveSampleProjectState();
+    notify('サンプル案件を読み込みました', 'success');
+  };
+
   return (
     <AppFrame toolName="Portal" status="Workspace">
       {showTutorialBanner ? (
@@ -136,6 +142,7 @@ function PortalPage() {
           </div>
           <div className="bannerActions">
             <Link to="/tutorial" className="button buttonPrimary">チュートリアルを見る</Link>
+            <button type="button" className="button buttonPrimary" onClick={loadSampleProject}>サンプルで試す</button>
             <button type="button" className="button buttonSecondary" onClick={dismissTutorialBanner}>あとで見る</button>
           </div>
         </section>
@@ -177,6 +184,7 @@ function PortalPage() {
             <span>平面図 {sampleProject.summary.floorplans}</span>
             <span>ピン {sampleProject.summary.pins}</span>
           </div>
+          <button type="button" className="button buttonSecondary" onClick={loadSampleProject}>サンプル案件を読み込む</button>
         </article>
       </section>
 

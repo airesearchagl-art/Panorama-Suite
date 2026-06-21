@@ -76,6 +76,33 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">v1.7 Sample Run</p>
+          <h2>サンプル案件を完走する</h2>
+          <ol className="docList">
+            <li>PortalまたはTutorialで「サンプル案件を読み込む」を押す。</li>
+            <li>各ページに表示されるサンプル案件カードで、パノラマ、平面図、ピン、レビュー項目を確認する。</li>
+            <li>Share Hubでは共有メモ例が自動入力され、実ファイル0件でもデモ用のmanifest / index / ZIPを書き出せます。</li>
+            <li>実運用では、各ページで手元の画像や案件データファイルを登録してください。</li>
+          </ol>
+        </article>
+
+        <article className="infoPanel">
+          <p className="sectionKicker">公開前チェック</p>
+          <h2>共有前に確認すること</h2>
+          <ul className="docList">
+            <li>パノラマ画像が開ける。</li>
+            <li>変換結果を確認できる。</li>
+            <li>案件情報が整理されている。</li>
+            <li>平面図ピンが確認できる。</li>
+            <li>レビュー書き出しでレビュー情報を確認できる。</li>
+            <li>Share HubでZIPを書き出せる。</li>
+            <li>share-index.htmlをブラウザで開ける。</li>
+            <li>share-manifest.jsonに案件情報が入っている。</li>
+            <li>外部送信しないローカル共有であることを確認する。</li>
+          </ul>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">Availability</p>
           <h2>ツールカードの状態表示</h2>
           <ul className="docList">

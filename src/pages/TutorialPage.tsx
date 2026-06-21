@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import AppFrame from '../components/AppFrame';
-import { sampleProject } from '../data/sampleProject';
+import { useToast } from '../components/ToastProvider';
+import { sampleProject, saveSampleProjectState } from '../data/sampleProject';
 
 const tutorialSteps = [
   {
@@ -53,8 +54,14 @@ const glossaryItems = [
 ];
 
 function TutorialPage() {
+  const { notify } = useToast();
+  const loadSampleProject = () => {
+    saveSampleProjectState();
+    notify('サンプル案件を読み込みました', 'success');
+  };
+
   return (
-    <AppFrame toolName="はじめての使い方" status="v1.6">
+    <AppFrame toolName="はじめての使い方" status="v1.7">
       <section className="heroSection workspaceHero" aria-labelledby="tutorial-title">
         <div>
           <p className="eyebrow">User Tutorial / Sample Workflow</p>
@@ -66,6 +73,9 @@ function TutorialPage() {
         <div className="securityPanel">
           <strong>🔒 ローカル処理</strong>
           <span>チュートリアルで扱う案件データや画像はブラウザ内で処理します。外部APIへ送信しません。</span>
+          <button type="button" className="button buttonPrimary" onClick={loadSampleProject}>
+            サンプル案件を読み込む
+          </button>
         </div>
       </section>
 
@@ -78,17 +88,26 @@ function TutorialPage() {
           <span className="sectionMeta">6 steps</span>
         </div>
         <div className="tutorialStepGrid">
-          {tutorialSteps.map((step) => (
+          {tutorialSteps.map((step, index) => (
             <article className="tutorialStepCard" key={step.href}>
+              <span className="statusBadge statusMvp">Step {index + 1}</span>
               <h3>{step.title}</h3>
               <p>{step.description}</p>
+              <p className="stepNextText">
+                {index < tutorialSteps.length - 1 ? `次: ${tutorialSteps[index + 1].title}` : '完走: Share Hubで共有ZIPを書き出します'}
+              </p>
               <div className="tutorialStepActions">
-                <Link to={step.href} className="button buttonPrimary">{step.action}</Link>
+                <Link to={step.href} className="button buttonPrimary">このステップを開く</Link>
                 {'externalHref' in step ? (
                   <a href={step.externalHref} target="_blank" rel="noreferrer" className="button buttonSecondary">
                     {step.externalAction}
                   </a>
                 ) : null}
+                {index < tutorialSteps.length - 1 ? (
+                  <Link to={tutorialSteps[index + 1].href} className="button buttonSecondary">次に進む</Link>
+                ) : (
+                  <Link to="/share-hub" className="button buttonSecondary">Share Hubへ進む</Link>
+                )}
               </div>
             </article>
           ))}
@@ -107,7 +126,10 @@ function TutorialPage() {
           <article className="infoPanel">
             <h3>{sampleProject.projectName}</h3>
             <p>{sampleProject.description}</p>
-            <p>{sampleProject.note}</p>
+            <p>{sampleProject.shareNote}</p>
+            <button type="button" className="button buttonPrimary" onClick={loadSampleProject}>
+              サンプル案件を読み込む
+            </button>
           </article>
           <div className="dashboardGrid compactDashboard">
             <article className="metricCard"><span>パノラマ</span><strong>{sampleProject.summary.panoramas}</strong></article>
@@ -116,6 +138,24 @@ function TutorialPage() {
           </div>
         </div>
         <p className="sectionNote">サンプル案件はメタ情報のみです。実画像ファイルは含まれないため、画像処理を試す場合は手元の jpg / png / webp を読み込んでください。</p>
+        <div className="sampleListGrid">
+          <article className="infoPanel">
+            <h3>サンプルパノラマ</h3>
+            <ul className="docList">
+              {sampleProject.panoramas.map((panorama) => (
+                <li key={panorama.id}>{panorama.fileName}: {panorama.floor} / {panorama.locationName}</li>
+              ))}
+            </ul>
+          </article>
+          <article className="infoPanel">
+            <h3>サンプルレビュー項目</h3>
+            <ul className="docList">
+              {sampleProject.reviewNotes.map((note) => (
+                <li key={note.id}>{note.target}: {note.comment}</li>
+              ))}
+            </ul>
+          </article>
+        </div>
       </section>
 
       <section className="sectionBlock">

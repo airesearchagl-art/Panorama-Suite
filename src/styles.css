@@ -2422,6 +2422,86 @@ h1 {
   grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
 }
 
+.sampleContextPanel {
+  border-color: rgba(79, 124, 255, 0.32);
+  background: rgba(79, 124, 255, 0.06);
+}
+
+.sampleListGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 14px;
+}
+
+.sampleMiniCard {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: rgba(17, 24, 39, 0.42);
+}
+
+.sampleMiniCard strong {
+  overflow-wrap: anywhere;
+}
+
+.sampleMiniCard span,
+.stepNextText {
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.sampleFloorMapPreview {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+}
+
+.sampleFloorMapCanvas {
+  position: relative;
+  min-height: 260px;
+  overflow: hidden;
+  border: 1px dashed rgba(156, 163, 175, 0.72);
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    rgba(17, 24, 39, 0.68);
+  background-size: 44px 44px;
+}
+
+.sampleFloorMapCanvas::before {
+  position: absolute;
+  inset: 18px;
+  border: 2px solid rgba(79, 124, 255, 0.34);
+  border-radius: 8px;
+  content: '';
+}
+
+.samplePin {
+  position: absolute;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-card);
+}
+
+.samplePinList {
+  display: grid;
+  gap: 10px;
+}
+
 .compactDashboard {
   align-content: stretch;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2695,7 +2775,8 @@ h1 {
 
   .tutorialBanner,
   .sampleProjectPanel,
-  .helpHintPanel {
+  .helpHintPanel,
+  .sampleFloorMapPreview {
     grid-template-columns: 1fr;
   }
 

@@ -1,7 +1,8 @@
 import JSZip from 'jszip';
-import { useMemo, useState, type DragEvent } from 'react';
+import { useEffect, useMemo, useState, type DragEvent } from 'react';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
+import { createSampleShareProject, getSampleProjectState, type SampleProject } from '../data/sampleProject';
 
 type ShareProject = {
   project?: {
@@ -179,6 +180,7 @@ function ShareHubPage() {
   const [note, setNote] = useState('');
   const [registeredFiles, setRegisteredFiles] = useState<RegisteredShareFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [sample, setSample] = useState<SampleProject | null>(null);
 
   const floorMapPins = useMemo(() => projectData?.floorMaps?.reduce((sum, floorMap) => sum + (floorMap.pins?.length ?? 0), 0) ?? 0, [projectData]);
   const expectedFiles = useMemo(() => projectData ? buildShareFiles(projectData) : [], [projectData]);
@@ -206,6 +208,16 @@ function ShareHubPage() {
       notify('ファイルを読み込めませんでした', 'error');
     }
   };
+
+  useEffect(() => {
+    const sampleState = getSampleProjectState();
+    if (!sampleState) {
+      return;
+    }
+    setSample(sampleState);
+    setProjectData(createSampleShareProject());
+    setNote(sampleState.shareNote);
+  }, []);
 
   const addShareFiles = (files: FileList | File[]) => {
     const fileArray = Array.from(files);
@@ -317,6 +329,19 @@ function ShareHubPage() {
           <li>外部送信せず、ブラウザ内でZIPを作成</li>
         </ul>
       </section>
+
+      {sample ? (
+        <section className="sectionBlock sampleContextPanel">
+          <div className="sectionHeading">
+            <div>
+              <p className="sectionKicker">サンプル案件</p>
+              <h2>{sample.projectName}</h2>
+            </div>
+            <span className="statusBadge statusMvp">共有ZIPまで試せます</span>
+          </div>
+          <p>サンプルメタ情報を読み込み済みです。実ファイルは0件でも、デモ用の share-manifest.json / share-index.html / 共有ZIPを書き出せます。</p>
+        </section>
+      ) : null}
 
       <section className="dashboardGrid" aria-label="共有パッケージ作成 Dashboard">
         <article className="metricCard"><span>パノラマ</span><strong>{projectData?.panoramas?.length ?? 0}</strong></article>

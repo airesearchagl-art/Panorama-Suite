@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
 import { loadReviewProjectHandoff } from '../data/handoff';
+import { getSampleProjectState, type SampleProject } from '../data/sampleProject';
 
 type ProjectInfo = {
   projectName?: string;
@@ -231,6 +232,7 @@ function ReviewExporterPage() {
   const [reviewComments, setReviewComments] = useState<ReviewComment[]>([]);
   const [commentForm, setCommentForm] = useState<ReviewCommentForm>(initialCommentForm);
   const [editingCommentId, setEditingCommentId] = useState('');
+  const [sample, setSample] = useState<SampleProject | null>(null);
   const reportCreatedAt = useMemo(() => new Date().toISOString(), [projectData]);
 
   const pinCount = projectData?.floorMaps.reduce((total, floorMap) => total + floorMap.pins.length, 0) ?? 0;
@@ -311,6 +313,10 @@ function ReviewExporterPage() {
       notify('案件データファイルを読み込めませんでした', 'error');
     }
   }, [notify]);
+
+  useEffect(() => {
+    setSample(getSampleProjectState());
+  }, []);
 
   const importProjectFile = async (fileList: FileList | null) => {
     const file = fileList?.[0];
@@ -536,6 +542,27 @@ function ReviewExporterPage() {
           <li>HTML書き出し、CSV書き出し、印刷 / PDF保存を行う</li>
         </ol>
       </section>
+
+      {sample ? (
+        <section className="sectionBlock sampleContextPanel noPrint">
+          <div className="sectionHeading">
+            <div>
+              <p className="sectionKicker">サンプル案件</p>
+              <h2>レビュー書き出しのイメージ</h2>
+            </div>
+            <span className="statusBadge statusMvp">レビュー項目 {sample.reviewNotes.length} 件</span>
+          </div>
+          <div className="sampleListGrid">
+            {sample.reviewNotes.map((note) => (
+              <article className="sampleMiniCard" key={note.id}>
+                <strong>{note.target}</strong>
+                <span>{note.priority} / {note.status}</span>
+                <span>{note.comment}</span>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="dashboardGrid noPrint" aria-label="レビュー書き出し ダッシュボード">
         <article className="metricCard"><span>パノラマ</span><strong>{projectData?.panoramas.length ?? 0}</strong></article>

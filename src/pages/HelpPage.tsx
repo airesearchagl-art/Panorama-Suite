@@ -289,7 +289,17 @@ function HelpPage() {
 
         <article className="infoPanel">
           <h2>サンプル案件で何を確認できますか？</h2>
-          <p>実画像なしで、案件名、パノラマ数、平面図数、ピン数、共有メモ例を確認できます。画像処理を試す場合は手元の画像を読み込んでください。</p>
+          <p>実画像なしで、案件名、パノラマ一覧、平面図、ピン、レビュー項目、共有メモ例を確認できます。画像処理を試す場合は手元の画像を読み込んでください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>サンプル案件を読み込んだ後は何をすればよいですか？</h2>
+          <p>Converter、Packager、FloorMap、Review Exporter、Share Hubを順番に開いてください。各ページにサンプル案件カードが表示され、役割を確認できます。最後にShare Hubで共有ZIPを書き出します。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>実ファイル0件でも共有ZIPを書き出してよいですか？</h2>
+          <p>サンプル案件ではデモ用として書き出せます。実運用では、共有対象ファイル登録エリアに project.json、review-report.html、画像、CSVなどを追加してください。</p>
         </article>
 
         <article className="infoPanel">
@@ -345,6 +355,11 @@ function HelpPage() {
         <article className="infoPanel">
           <h2>クラウド共有ではないこと</h2>
           <p>共有パッケージ作成はZIPをローカルで作る機能です。外部サーバーへのアップロード、URL発行、NAS連携はまだ行いません。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>公開前に何を確認すればよいですか？</h2>
+          <p>パノラマが開けること、変換結果、案件情報、平面図ピン、レビュー情報、共有ZIP、share-index.html、share-manifest.jsonを確認してください。外部送信しないローカル共有であることも共有先に説明してください。</p>
         </article>
 
         <article className="infoPanel">
