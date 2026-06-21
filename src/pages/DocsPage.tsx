@@ -89,7 +89,7 @@ function DocsPage() {
 
         <article className="infoPanel">
           <p className="sectionKicker">公開前チェック</p>
-          <h2>v1.9 リリース候補チェック</h2>
+          <h2>v2.0 公開版チェック</h2>
           <ul className="docList">
             <li>トップページが開ける。</li>
             <li>チュートリアルに行ける。</li>

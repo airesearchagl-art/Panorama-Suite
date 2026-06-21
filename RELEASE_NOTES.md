@@ -1,5 +1,14 @@
 # Release Notes
 
+## v2.0.0
+
+- v1.9リリース候補を正式な公開版として確定。
+- Vercel本番URL、主要ルート、Tutorial、サンプル案件、Share Hubの共有ZIP導線を公開前QA対象として整理。
+- READMEを利用者向けの入口、サンプル案件、共有ZIP、ローカル処理、開発者向け手順の順に最終化。
+- 主要画面スクリーンショットを `public/screenshots/` に追加し、GitHub上で画面イメージを確認できるようにした。
+- v2.0.0タグとGitHub Release用の本文を準備。
+- 新機能追加ではなく、GitHub / Vercelで共有できる公開版リリースとして区切った。
+
 ## v1.9
 
 - v2.0公開前のリリース候補として、主要ルート、Tutorial、サンプル案件、Share Hub、Docs、Help、READMEの導線をQA。
