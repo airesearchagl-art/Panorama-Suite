@@ -525,6 +525,18 @@ function ReviewExporterPage() {
         </div>
       </section>
 
+      <section className="sectionBlock helpHintPanel noPrint" aria-label="このページでできること">
+        <div>
+          <p className="sectionKicker">このページでできること</p>
+          <h2>案件データを確認用レポートにします</h2>
+        </div>
+        <ol className="inlineStepList">
+          <li>案件データファイルを読み込む</li>
+          <li>注意事項とレビューコメントを確認する</li>
+          <li>HTML書き出し、CSV書き出し、印刷 / PDF保存を行う</li>
+        </ol>
+      </section>
+
       <section className="dashboardGrid noPrint" aria-label="レビュー書き出し ダッシュボード">
         <article className="metricCard"><span>パノラマ</span><strong>{projectData?.panoramas.length ?? 0}</strong></article>
         <article className="metricCard"><span>平面図</span><strong>{projectData?.floorplans.length ?? 0}</strong></article>

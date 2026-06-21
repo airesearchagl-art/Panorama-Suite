@@ -2341,6 +2341,121 @@ h1 {
   font-weight: 700;
 }
 
+.tutorialBanner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 18px;
+  border: 1px solid rgba(79, 124, 255, 0.48);
+  border-radius: var(--radius-card);
+  background: rgba(79, 124, 255, 0.12);
+  box-shadow: var(--shadow-card);
+}
+
+.tutorialBanner h2,
+.tutorialBanner p {
+  margin: 0;
+}
+
+.tutorialBanner p {
+  color: var(--color-text-muted);
+}
+
+.bannerActions,
+.miniMetrics,
+.inlineStepList,
+.tutorialStepActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bannerActions {
+  justify-content: flex-end;
+}
+
+.tutorialIntroCard {
+  border-color: rgba(79, 124, 255, 0.52);
+}
+
+.miniMetrics span {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+}
+
+.tutorialStepGrid,
+.glossaryGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tutorialStepCard {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: rgba(31, 41, 55, 0.72);
+  box-shadow: var(--shadow-card);
+}
+
+.tutorialStepCard h3,
+.tutorialStepCard p {
+  margin: 0;
+}
+
+.tutorialStepCard p,
+.sectionNote {
+  color: var(--color-text-muted);
+}
+
+.sampleProjectPanel {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+}
+
+.compactDashboard {
+  align-content: stretch;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.helpHintPanel {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  border-color: rgba(16, 185, 129, 0.28);
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.helpHintPanel h2,
+.helpHintPanel p {
+  margin: 0;
+}
+
+.inlineStepList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inlineStepList li {
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.42);
+  color: var(--color-text-main);
+  font-size: 0.86rem;
+}
+
 .thumbnailGrid {
   display: grid;
   gap: 16px;
@@ -2577,6 +2692,17 @@ h1 {
   .importedInfo {
     grid-template-columns: 1fr;
   }
+
+  .tutorialBanner,
+  .sampleProjectPanel,
+  .helpHintPanel {
+    grid-template-columns: 1fr;
+  }
+
+  .tutorialStepGrid,
+  .glossaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -2679,5 +2805,19 @@ h1 {
 
   .pinCoordinateGrid {
     grid-template-columns: 1fr;
+  }
+
+  .tutorialStepGrid,
+  .glossaryGrid,
+  .compactDashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .bannerActions {
+    justify-content: stretch;
+  }
+
+  .bannerActions .button {
+    width: 100%;
   }
 }

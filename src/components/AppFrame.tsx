@@ -65,6 +65,7 @@ function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: A
                 </span>
               ))}
             <span className="sideLabel">ガイド</span>
+            <NavLink to="/tutorial">はじめての使い方</NavLink>
             <NavLink to="/docs">使い方ガイド</NavLink>
             <NavLink to="/help">ヘルプ</NavLink>
             <NavLink to="/docs/design-system">画面設計ルール</NavLink>

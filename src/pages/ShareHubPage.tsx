@@ -305,6 +305,19 @@ function ShareHubPage() {
         </div>
       </section>
 
+      <section className="sectionBlock helpHintPanel" aria-label="共有ZIPとは">
+        <div>
+          <p className="sectionKicker">共有ZIPとは？</p>
+          <h2>共有用の確認HTML、目録データ、関連ファイルを1つにまとめたZIPです</h2>
+        </div>
+        <ul className="inlineStepList">
+          <li>share-manifest.json: 共有内容の目録データ</li>
+          <li>share-index.html: ブラウザで見る確認用ページ</li>
+          <li>files/: 登録した共有対象ファイル</li>
+          <li>外部送信せず、ブラウザ内でZIPを作成</li>
+        </ul>
+      </section>
+
       <section className="dashboardGrid" aria-label="共有パッケージ作成 Dashboard">
         <article className="metricCard"><span>パノラマ</span><strong>{projectData?.panoramas?.length ?? 0}</strong></article>
         <article className="metricCard"><span>平面図</span><strong>{projectData?.floorplans?.length ?? 0}</strong></article>

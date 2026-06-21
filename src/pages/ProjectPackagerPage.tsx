@@ -885,6 +885,19 @@ function ProjectPackagerPage() {
         </div>
       </section>
 
+      <section className="sectionBlock helpHintPanel" aria-label="このページでできること">
+        <div>
+          <p className="sectionKicker">このページでできること</p>
+          <h2>案件情報、画像、平面図、品質チェック結果を1つにまとめます</h2>
+        </div>
+        <ol className="inlineStepList">
+          <li>案件情報と画像を登録する</li>
+          <li>シーンごとの場所名や方位を整理する</li>
+          <li>平面図ピン配置やレビューへ送る</li>
+          <li>最後にZIPとして保存する</li>
+        </ol>
+      </section>
+
       <section className="dashboardGrid" aria-label="案件パッケージ作成 ダッシュボード">
         <article className="metricCard"><span>パノラマ</span><strong>{panoramas.length}</strong></article>
         <article className="metricCard"><span>平面図</span><strong>{floorplans.length}</strong></article>

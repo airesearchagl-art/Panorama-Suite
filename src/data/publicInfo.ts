@@ -10,6 +10,7 @@ export const publicUrls = {
   thumbnailGenerator: 'https://panorama-suite.vercel.app/thumbnail-generator',
   panoramaDiff: 'https://panorama-suite.vercel.app/panorama-diff',
   shareHub: 'https://panorama-suite.vercel.app/share-hub',
+  tutorial: 'https://panorama-suite.vercel.app/tutorial',
   docs: 'https://panorama-suite.vercel.app/docs',
   help: 'https://panorama-suite.vercel.app/help',
   designSystem: 'https://panorama-suite.vercel.app/docs/design-system',

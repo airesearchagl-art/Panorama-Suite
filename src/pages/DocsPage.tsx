@@ -43,6 +43,7 @@ function DocsPage() {
             <li>サムネイル一覧作成: <a href={publicUrls.thumbnailGenerator}>{publicUrls.thumbnailGenerator}</a></li>
             <li>画像比較: <a href={publicUrls.panoramaDiff}>{publicUrls.panoramaDiff}</a></li>
             <li>共有パッケージ作成: <a href={publicUrls.shareHub}>{publicUrls.shareHub}</a></li>
+            <li>はじめての使い方: <a href={publicUrls.tutorial}>{publicUrls.tutorial}</a></li>
           </ul>
         </article>
 
@@ -59,7 +60,19 @@ function DocsPage() {
             <li>サムネイル一覧作成: 複数画像からサムネイル一覧HTMLとCSVを作成します。</li>
             <li>画像比較: A案・B案などの画像を並べて、スライダーと簡易差分で確認します。</li>
             <li>共有パッケージ作成: 案件データファイルの概要と共有用目録を作成します。</li>
+            <li>はじめての使い方: 初回利用者向けに、操作順とサンプル案件を案内します。</li>
           </ul>
+        </article>
+
+        <article className="infoPanel">
+          <p className="sectionKicker">Tutorial v1.6</p>
+          <h2>はじめての使い方</h2>
+          <ol className="docList">
+            <li>Portalの「はじめての方へ」から `/tutorial` を開く。</li>
+            <li>品質チェック、画像変換、案件パッケージ作成、平面図ピン配置、レビュー書き出し、共有ZIP作成の順番を確認する。</li>
+            <li>サンプル案件のパノラマ数、平面図数、ピン数を見て、どの情報がツール間で使われるか理解する。</li>
+            <li>実画像を試す場合は、各ツールページで手元の jpg / png / webp を読み込む。</li>
+          </ol>
         </article>
 
         <article className="infoPanel">
@@ -270,6 +283,7 @@ function DocsPage() {
           <p className="sectionKicker">作業フロー</p>
           <h2>基本的な利用フロー</h2>
           <ol className="docList">
+            <li>はじめての使い方で、全体の流れと用語を確認する。</li>
             <li>パノラマ品質チェックで画像のサイズ、比率、名前を確認する。</li>
             <li>パノラマ画像変換で形式と解像度を整える。</li>
             <li>案件パッケージ作成で案件情報、シーンごとの管理情報、画像、品質チェック結果をZIP化する。</li>

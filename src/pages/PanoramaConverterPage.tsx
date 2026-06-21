@@ -366,6 +366,18 @@ function PanoramaConverterPage() {
         </div>
       </section>
 
+      <section className="sectionBlock helpHintPanel" aria-label="このページでできること">
+        <div>
+          <p className="sectionKicker">このページでできること</p>
+          <h2>画像を提出・管理しやすい形式に整えます</h2>
+        </div>
+        <ol className="inlineStepList">
+          <li>画像を読み込む</li>
+          <li>出力形式・サイズを選ぶ</li>
+          <li>変換して個別またはZIPで保存する</li>
+        </ol>
+      </section>
+
       <section className="dashboardGrid" aria-label="パノラマ画像変換 ダッシュボード">
         <article className="metricCard"><span>入力画像</span><strong>{images.length}</strong></article>
         <article className="metricCard successMetric"><span>変換済み</span><strong>{convertedImages.length}</strong></article>

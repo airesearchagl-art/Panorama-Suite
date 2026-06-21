@@ -498,6 +498,19 @@ function FloorMapBuilderPage() {
         </div>
       </section>
 
+      <section className="sectionBlock helpHintPanel" aria-label="このページでできること">
+        <div>
+          <p className="sectionKicker">このページでできること</p>
+          <h2>平面図にパノラマの撮影位置を置きます</h2>
+        </div>
+        <ol className="inlineStepList">
+          <li>案件データファイルを読み込む</li>
+          <li>平面図画像を読み込む</li>
+          <li>パノラマを選んでピンを配置・ドラッグ調整する</li>
+          <li>更新済み案件データを書き出す</li>
+        </ol>
+      </section>
+
       <section className="dashboardGrid" aria-label="平面図ピン配置 ダッシュボード">
         <article className="metricCard"><span>平面図</span><strong>{activeFloorMaps.length}</strong></article>
         <article className="metricCard"><span>パノラマ</span><strong>{panoramas.length}</strong></article>

@@ -278,7 +278,23 @@ function HelpPage() {
             <li>サムネイル一覧作成: <a href={publicUrls.thumbnailGenerator}>{publicUrls.thumbnailGenerator}</a></li>
             <li>画像比較: <a href={publicUrls.panoramaDiff}>{publicUrls.panoramaDiff}</a></li>
             <li>共有パッケージ作成: <a href={publicUrls.shareHub}>{publicUrls.shareHub}</a></li>
+            <li>はじめての使い方: <a href={publicUrls.tutorial}>{publicUrls.tutorial}</a></li>
           </ul>
+        </article>
+
+        <article className="infoPanel">
+          <h2>初めて使う場合はどこから始めますか？</h2>
+          <p>Portalの「はじめての方へ」または `/tutorial` を開いてください。品質チェックから共有ZIP作成までの順番を確認できます。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>サンプル案件で何を確認できますか？</h2>
+          <p>実画像なしで、案件名、パノラマ数、平面図数、ピン数、共有メモ例を確認できます。画像処理を試す場合は手元の画像を読み込んでください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>どの順番で使うのが基本ですか？</h2>
+          <p>品質チェック、画像変換、案件パッケージ作成、平面図ピン配置、レビュー書き出し、共有パッケージ作成の順番が基本です。必要に応じて途中のツールだけ使うこともできます。</p>
         </article>
 
         <article className="infoPanel">

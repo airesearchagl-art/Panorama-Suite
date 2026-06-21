@@ -1,8 +1,9 @@
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import AppFrame from './components/AppFrame';
 import { ToastProvider, useToast } from './components/ToastProvider';
 import { availabilityLabels, categories, getCategoryLabel, tools, type Tool, type ToolAvailability, type ToolCategory } from './data/tools';
+import { sampleProject } from './data/sampleProject';
 
 const DesignSystemPage = lazy(() => import('./pages/DesignSystemPage'));
 const DocsPage = lazy(() => import('./pages/DocsPage'));
@@ -15,6 +16,7 @@ const ProjectPackagerPage = lazy(() => import('./pages/ProjectPackagerPage'));
 const ReviewExporterPage = lazy(() => import('./pages/ReviewExporterPage'));
 const ShareHubPage = lazy(() => import('./pages/ShareHubPage'));
 const ThumbnailGeneratorPage = lazy(() => import('./pages/ThumbnailGeneratorPage'));
+const TutorialPage = lazy(() => import('./pages/TutorialPage'));
 
 const statusTone: Record<ToolAvailability, string> = {
   available: 'statusAvailable',
@@ -86,6 +88,7 @@ function PortalPage() {
   const [keyword, setKeyword] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<ToolCategory | 'All'>('All');
   const [availabilityFilter, setAvailabilityFilter] = useState<ToolAvailability | 'All'>('All');
+  const [showTutorialBanner, setShowTutorialBanner] = useState(false);
   const availableCount = tools.filter((tool) => tool.isEnabled).length;
   const mvpCount = tools.filter((tool) => tool.availability === 'mvp').length;
   const roadmapCount = tools.filter((tool) => ['development', 'concept', 'future'].includes(tool.availability)).length;
@@ -113,8 +116,31 @@ function PortalPage() {
     setAvailabilityFilter('All');
   };
 
+  useEffect(() => {
+    setShowTutorialBanner(localStorage.getItem('panorama-suite:tutorial-dismissed') !== 'true');
+  }, []);
+
+  const dismissTutorialBanner = () => {
+    localStorage.setItem('panorama-suite:tutorial-dismissed', 'true');
+    setShowTutorialBanner(false);
+  };
+
   return (
     <AppFrame toolName="Portal" status="Workspace">
+      {showTutorialBanner ? (
+        <section className="tutorialBanner" aria-label="初回チュートリアル案内">
+          <div>
+            <p className="sectionKicker">はじめての方へ</p>
+            <h2>Panorama Suiteの使う順番を確認できます</h2>
+            <p>品質チェックから共有ZIP作成まで、サンプル案件を見ながら基本フローを確認できます。</p>
+          </div>
+          <div className="bannerActions">
+            <Link to="/tutorial" className="button buttonPrimary">チュートリアルを見る</Link>
+            <button type="button" className="button buttonSecondary" onClick={dismissTutorialBanner}>あとで見る</button>
+          </div>
+        </section>
+      ) : null}
+
       <section className="heroSection workspaceHero" aria-labelledby="page-title">
         <div>
           <p className="eyebrow">Information First / Workspace Style</p>
@@ -133,6 +159,25 @@ function PortalPage() {
         <article className="metricCard"><span>基本機能版</span><strong>{mvpCount}</strong></article>
         <article className="metricCard warningMetric"><span>今後追加予定</span><strong>{roadmapCount}</strong></article>
         <article className="metricCard"><span>表示中</span><strong>{filteredTools.length}</strong></article>
+      </section>
+
+      <section className="sectionBlock splitSections" aria-label="はじめての方へ">
+        <article className="infoPanel tutorialIntroCard">
+          <p className="sectionKicker">Tutorial</p>
+          <h2>はじめての方へ</h2>
+          <p>何をするツールか、どの順番で使うか、サンプル案件でどう試すかを確認できます。</p>
+          <Link to="/tutorial" className="button buttonPrimary">はじめての使い方を開く</Link>
+        </article>
+        <article className="infoPanel">
+          <p className="sectionKicker">Sample Project</p>
+          <h2>{sampleProject.projectName}</h2>
+          <p>{sampleProject.description}</p>
+          <div className="miniMetrics">
+            <span>パノラマ {sampleProject.summary.panoramas}</span>
+            <span>平面図 {sampleProject.summary.floorplans}</span>
+            <span>ピン {sampleProject.summary.pins}</span>
+          </div>
+        </article>
       </section>
 
       <section className="sectionBlock" aria-labelledby="categories-title">
@@ -254,6 +299,7 @@ function App() {
           <Route path="/thumbnail-generator" element={<ThumbnailGeneratorPage />} />
           <Route path="/panorama-diff" element={<PanoramaDiffPage />} />
           <Route path="/share-hub" element={<ShareHubPage />} />
+          <Route path="/tutorial" element={<TutorialPage />} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/docs/design-system" element={<DesignSystemPage />} />
