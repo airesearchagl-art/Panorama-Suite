@@ -2,6 +2,8 @@ import { Link, NavLink } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { enabledTools, tools } from '../data/tools';
 
+const guideToolIds = new Set(['documentation', 'help', 'design-system']);
+
 type AppFrameProps = {
   toolName: string;
   status: string;
@@ -44,7 +46,7 @@ function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: A
             <NavLink to="/">Portal</NavLink>
             <span className="sideLabel">ツール</span>
             {enabledTools
-              .filter((tool) => tool.category !== 'Documentation')
+              .filter((tool) => !guideToolIds.has(tool.id))
               .map((tool) =>
                 tool.isExternal && tool.href ? (
                   <a href={tool.href} target="_blank" rel="noreferrer" key={tool.id}>

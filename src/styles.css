@@ -2332,6 +2332,139 @@ h1 {
   opacity: 0.42;
 }
 
+.thumbnailGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.thumbnailCard {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: rgba(31, 41, 55, 0.72);
+  box-shadow: var(--shadow-card);
+}
+
+.thumbnailCard img {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--color-background);
+}
+
+.thumbnailCard strong {
+  overflow-wrap: anywhere;
+}
+
+.thumbnailCard span {
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+}
+
+.compactDropZone {
+  min-height: 140px;
+  padding: 22px;
+}
+
+.diffUploadGrid,
+.diffCompareGrid,
+.shareWorkspace {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.diffImagePanel {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: rgba(31, 41, 55, 0.72);
+}
+
+.diffImagePanel h3 {
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+}
+
+.diffImagePanel img {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #0b1120;
+}
+
+.diffSliderBox {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: #0b1120;
+}
+
+.diffSliderBox img,
+.diffSliderOverlay img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: contain;
+}
+
+.diffSliderOverlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-right: 2px solid var(--color-accent);
+}
+
+.diffSliderOverlay img {
+  width: 100%;
+  max-width: none;
+}
+
+.rangeInput {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.diffCanvas {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: #0b1120;
+}
+
+.summaryList {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.summaryList div {
+  display: grid;
+  gap: 2px;
+}
+
+.summaryList dt {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.summaryList dd {
+  margin: 0;
+  color: var(--color-text-main);
+}
+
 @media (max-width: 920px) {
   .suiteHeader {
     grid-template-columns: 1fr;
@@ -2392,7 +2525,10 @@ h1 {
   .importPanel,
   .converterLayout,
   .floorMapLayout,
-  .floorMapMeta {
+  .floorMapMeta,
+  .diffUploadGrid,
+  .diffCompareGrid,
+  .shareWorkspace {
     grid-template-columns: 1fr;
   }
 

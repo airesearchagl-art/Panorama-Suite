@@ -18,7 +18,7 @@ function DocsPage() {
 
       <section className="dashboardGrid">
         <article className="metricCard"><span>バージョン</span><strong>v0.1.0</strong></article>
-        <article className="metricCard"><span>基本機能版</span><strong>4</strong></article>
+        <article className="metricCard"><span>基本機能版</span><strong>8</strong></article>
         <article className="metricCard successMetric"><span>処理方式</span><strong>ローカル</strong></article>
         <article className="metricCard"><span>公開先</span><strong>Vercel</strong></article>
       </section>
@@ -40,6 +40,9 @@ function DocsPage() {
             <li>パノラマ画像変換: <a href={publicUrls.converter}>{publicUrls.converter}</a></li>
             <li>平面図ピン配置: <a href={publicUrls.floormap}>{publicUrls.floormap}</a></li>
             <li>レビュー書き出し: <a href={publicUrls.reviewExporter}>{publicUrls.reviewExporter}</a></li>
+            <li>サムネイル一覧作成: <a href={publicUrls.thumbnailGenerator}>{publicUrls.thumbnailGenerator}</a></li>
+            <li>画像比較: <a href={publicUrls.panoramaDiff}>{publicUrls.panoramaDiff}</a></li>
+            <li>共有パッケージ作成: <a href={publicUrls.shareHub}>{publicUrls.shareHub}</a></li>
           </ul>
         </article>
 
@@ -53,6 +56,9 @@ function DocsPage() {
             <li>パノラマ画像変換: 画像形式、画質、サイズを変換します。</li>
             <li>平面図ピン配置: 平面図上にパノラマ撮影位置を配置します。</li>
             <li>レビュー書き出し: 案件データを読み込み、印刷・PDF保存しやすいHTMLレポートを作成します。</li>
+            <li>サムネイル一覧作成: 複数画像からサムネイル一覧HTMLとCSVを作成します。</li>
+            <li>画像比較: A案・B案などの画像を並べて、スライダーと簡易差分で確認します。</li>
+            <li>共有パッケージ作成: 案件データファイルの概要と共有用目録を作成します。</li>
           </ul>
         </article>
 
@@ -151,6 +157,43 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">サムネイル一覧作成</p>
+          <h2>画像一覧を提出用にまとめる</h2>
+          <ol className="docList">
+            <li>jpg / jpeg / png / webp のパノラマ画像を複数読み込む。</li>
+            <li>ファイル名、画像サイズ、サムネイルを一覧で確認する。</li>
+            <li>「HTML書き出し」でブラウザ印刷しやすい thumbnail-index.html を保存する。</li>
+            <li>「CSV書き出し」で thumbnail-list.csv を保存する。</li>
+          </ol>
+          <p>基本機能版ではPDFやPowerPointの直接生成は対象外です。PDF化は書き出したHTMLをブラウザ印刷してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <p className="sectionKicker">画像比較</p>
+          <h2>A案・B案を視覚的に比べる</h2>
+          <ol className="docList">
+            <li>A画像とB画像を読み込む。</li>
+            <li>左右並列表示で全体を確認する。</li>
+            <li>スライダー比較で同じ位置の違いを確認する。</li>
+            <li>簡易差分表示で色の違いが大きい範囲を確認する。</li>
+            <li>必要に応じて比較結果HTMLや差分PNGを書き出す。</li>
+          </ol>
+          <p>基本機能版ではAI差分抽出や高度な画像解析は対象外です。サイズが違う画像は表示上のサイズを合わせて比較します。</p>
+        </article>
+
+        <article className="infoPanel">
+          <p className="sectionKicker">共有パッケージ作成</p>
+          <h2>共有用の概要と目録を作る</h2>
+          <ol className="docList">
+            <li>案件データファイル（project.json / updated-project.json）を読み込む。</li>
+            <li>案件概要、パノラマ数、平面図数、平面図ピン数を確認する。</li>
+            <li>共有用メモを入力する。</li>
+            <li>share-manifest.json と share-index.html を書き出す。</li>
+          </ol>
+          <p>基本機能版ではクラウド共有リンク発行、アップロード、外部サーバー連携は行いません。</p>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">Packager v0.3</p>
           <h2>平面図ピン情報をZIPに同梱する</h2>
           <ol className="docList">
@@ -221,7 +264,9 @@ function DocsPage() {
             <li>案件パッケージ作成で再読み込みする。</li>
             <li>ZIPとして保存する。</li>
             <li>レビュー書き出しでレポートを確認し、印刷 / PDF保存する。</li>
-            <li>レビュー・共有・アーカイブへ展開する。</li>
+            <li>サムネイル一覧作成で提出・案件管理用の画像一覧を作る。</li>
+            <li>画像比較でA案・B案などの差分を確認する。</li>
+            <li>共有パッケージ作成で共有用の概要とファイル目録を整理する。</li>
           </ol>
         </article>
 

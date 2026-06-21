@@ -275,7 +275,35 @@ function HelpPage() {
             <li>Converter: <a href={publicUrls.converter}>{publicUrls.converter}</a></li>
             <li>平面図ピン配置: <a href={publicUrls.floormap}>{publicUrls.floormap}</a></li>
             <li>レビュー書き出し: <a href={publicUrls.reviewExporter}>{publicUrls.reviewExporter}</a></li>
+            <li>サムネイル一覧作成: <a href={publicUrls.thumbnailGenerator}>{publicUrls.thumbnailGenerator}</a></li>
+            <li>画像比較: <a href={publicUrls.panoramaDiff}>{publicUrls.panoramaDiff}</a></li>
+            <li>共有パッケージ作成: <a href={publicUrls.shareHub}>{publicUrls.shareHub}</a></li>
           </ul>
+        </article>
+
+        <article className="infoPanel">
+          <h2>サムネイルが表示されない場合</h2>
+          <p>対応形式は jpg、jpeg、png、webp です。画像ファイルが壊れている場合や、拡張子と実ファイル形式が一致しない場合は読み込めません。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>比較画像のサイズが違う場合</h2>
+          <p>画像比較では注意表示を出し、表示上のサイズを合わせて比較します。精密な画素比較が必要な場合は、先にパノラマ画像変換で同じ解像度にそろえてください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>差分表示がうまく見えない場合</h2>
+          <p>簡易差分はCanvas上で色の違いを目安として表示します。明るさや圧縮率の違いでも差分が出るため、左右並列表示とスライダー比較も併用してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>共有パッケージとは何ですか？</h2>
+          <p>案件データファイルの内容、共有用メモ、含まれるファイル目録をまとめたローカル共有用の情報です。クラウドアップロードや共有リンク発行は行いません。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>share-manifest.jsonとは何ですか？</h2>
+          <p>案件名、作成日時、共有メモ、パノラマ数、平面図数、ピン数、共有対象ファイル一覧を保存する共有用データファイルです。</p>
         </article>
 
         <article className="infoPanel">

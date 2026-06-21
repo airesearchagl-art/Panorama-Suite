@@ -8,9 +8,12 @@ import DocsPage from './pages/DocsPage';
 import FloorMapBuilderPage from './pages/FloorMapBuilderPage';
 import HelpPage from './pages/HelpPage';
 import PanoramaConverterPage from './pages/PanoramaConverterPage';
+import PanoramaDiffPage from './pages/PanoramaDiffPage';
 import PanoramaQaPage from './pages/PanoramaQaPage';
 import ProjectPackagerPage from './pages/ProjectPackagerPage';
 import ReviewExporterPage from './pages/ReviewExporterPage';
+import ShareHubPage from './pages/ShareHubPage';
+import ThumbnailGeneratorPage from './pages/ThumbnailGeneratorPage';
 
 const statusTone: Record<ToolAvailability, string> = {
   available: 'statusAvailable',
@@ -246,6 +249,9 @@ function App() {
         <Route path="/converter" element={<PanoramaConverterPage />} />
         <Route path="/floormap" element={<FloorMapBuilderPage />} />
         <Route path="/review-exporter" element={<ReviewExporterPage />} />
+        <Route path="/thumbnail-generator" element={<ThumbnailGeneratorPage />} />
+        <Route path="/panorama-diff" element={<PanoramaDiffPage />} />
+        <Route path="/share-hub" element={<ShareHubPage />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/docs/design-system" element={<DesignSystemPage />} />
