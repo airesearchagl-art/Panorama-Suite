@@ -804,6 +804,7 @@ ZIP化時の注意:
 - ブラウザ印刷によるPDF保存
 - `review-report.html` のHTML書き出し
 - `panorama-list.csv` のパノラマ一覧CSV書き出し
+- `review-comments.json` のレビューコメント書き出し
 
 Packager連携:
 
@@ -811,12 +812,40 @@ Packager連携:
 - sessionStorageキーは `panorama-suite:handoff:review-project` です。
 - 外部API送信は行いません。
 
+### レビューコメント機能
+
+レビュー書き出しでは、会議記録・設計確認・指摘管理用のコメントを入力できます。
+
+コメント対象:
+
+- 案件全体
+- パノラマ
+- 平面図ピン
+
+保存される主な項目:
+
+- `targetType`
+- `targetId`
+- `targetLabel`
+- `category`
+- `priority`
+- `status`
+- `comment`
+- `createdAt`
+- `updatedAt`
+
+コメントはレポート、HTML書き出し、印刷 / PDF保存に反映されます。
+コメントだけを `review-comments.json` として書き出し、あとから読み込むこともできます。
+
 今後の予定:
 
 - PowerPoint書き出し
 - Excel書き出し
 - 画像サムネイル付きレポート
 - コメント付きレビュー記録
+- コメントの案件データファイル統合
+- コメント付きPowerPoint書き出し
+- コメント一覧Excel書き出し
 
 ## ローカル起動方法
 

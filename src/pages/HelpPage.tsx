@@ -227,6 +227,31 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>コメントが保存されない場合</h2>
+          <p>レビューコメントはブラウザ内の画面状態として保持されます。ページを閉じる前に「レビューコメントを書き出し」で review-comments.json を保存してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>コメントを書き出す方法</h2>
+          <p>レビュー書き出しページでコメントを入力し、「レビューコメントを書き出し」を押すと review-comments.json として保存できます。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>コメントを読み込む方法</h2>
+          <p>「レビューコメントを読み込み」から review-comments.json を選択してください。読み込んだコメントはレポートにも反映されます。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>コメントがPDFに出ない場合</h2>
+          <p>コメントを追加したあとに「印刷 / PDF保存」を実行してください。印刷対象にはレポート内のレビューコメントセクションが含まれます。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>コメントの優先度・対応状況の意味</h2>
+          <p>優先度は対応の重要度、高・中・低を示します。対応状況は未対応、確認中、対応済み、保留で管理します。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>準備中表示の意味</h2>
           <p>準備中、開発中、構想中、将来予定のツールはまだ利用できません。カードはグレーアウトされ、クリック操作も無効です。</p>
         </article>

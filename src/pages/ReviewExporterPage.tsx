@@ -75,7 +75,49 @@ type RawReviewProject = Partial<ReviewProject> & {
   createdAt?: string;
 };
 
-const emptyQaSummary: QaSummary = { total: 0, ok: 0, warning: 0, error: 0 };
+type ReviewCommentTargetType = 'general' | 'panorama' | 'pin';
+type ReviewCommentCategory = '意匠' | '設備' | '施工' | '安全' | '施主確認' | 'その他';
+type ReviewCommentPriority = '高' | '中' | '低';
+type ReviewCommentStatus = '未対応' | '確認中' | '対応済み' | '保留';
+
+type ReviewComment = {
+  id: string;
+  targetType: ReviewCommentTargetType;
+  targetId: string;
+  targetLabel: string;
+  category: ReviewCommentCategory;
+  priority: ReviewCommentPriority;
+  status: ReviewCommentStatus;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type ReviewCommentForm = {
+  targetKey: string;
+  category: ReviewCommentCategory;
+  priority: ReviewCommentPriority;
+  status: ReviewCommentStatus;
+  comment: string;
+};
+
+type CommentTargetOption = {
+  key: string;
+  type: ReviewCommentTargetType;
+  id: string;
+  label: string;
+};
+
+const reviewCategories: ReviewCommentCategory[] = ['意匠', '設備', '施工', '安全', '施主確認', 'その他'];
+const reviewPriorities: ReviewCommentPriority[] = ['高', '中', '低'];
+const reviewStatuses: ReviewCommentStatus[] = ['未対応', '確認中', '対応済み', '保留'];
+const initialCommentForm: ReviewCommentForm = {
+  targetKey: 'general:general',
+  category: '意匠',
+  priority: '中',
+  status: '未対応',
+  comment: '',
+};
 
 function getExtension(fileName: string) {
   const lastDot = fileName.lastIndexOf('.');
@@ -186,10 +228,38 @@ function ReviewExporterPage() {
   const [projectData, setProjectData] = useState<ReviewProject | null>(null);
   const [loadedFileName, setLoadedFileName] = useState('');
   const [loadedFromHandoff, setLoadedFromHandoff] = useState(false);
+  const [reviewComments, setReviewComments] = useState<ReviewComment[]>([]);
+  const [commentForm, setCommentForm] = useState<ReviewCommentForm>(initialCommentForm);
+  const [editingCommentId, setEditingCommentId] = useState('');
   const reportCreatedAt = useMemo(() => new Date().toISOString(), [projectData]);
 
   const pinCount = projectData?.floorMaps.reduce((total, floorMap) => total + floorMap.pins.length, 0) ?? 0;
   const qaSummary = projectData?.qa.summary;
+  const commentTargetOptions = useMemo<CommentTargetOption[]>(() => {
+    if (!projectData) {
+      return [{ key: 'general:general', type: 'general', id: 'general', label: '案件全体' }];
+    }
+
+    return [
+      { key: 'general:general', type: 'general', id: 'general', label: '案件全体' },
+      ...projectData.panoramas.map((panorama) => ({
+        key: `panorama:${panorama.id || panorama.fileName}`,
+        type: 'panorama' as const,
+        id: panorama.id || panorama.fileName,
+        label: `パノラマ: ${panorama.locationName || panorama.fileName || panorama.id}`,
+      })),
+      ...projectData.floorMaps.flatMap((floorMap) =>
+        floorMap.pins.map((pin) => ({
+          key: `pin:${pin.id}`,
+          type: 'pin' as const,
+          id: pin.id,
+          label: `ピン: ${pin.label || pin.id}（${floorMap.name}）`,
+        })),
+      ),
+    ];
+  }, [projectData]);
+  const unresolvedCommentCount = reviewComments.filter((comment) => comment.status === '未対応').length;
+  const highPriorityCommentCount = reviewComments.filter((comment) => comment.priority === '高').length;
   const warningItems = useMemo(() => {
     if (!projectData) {
       return [];
@@ -219,6 +289,9 @@ function ReviewExporterPage() {
     setProjectData(parsed);
     setLoadedFileName(fileName);
     setLoadedFromHandoff(fromHandoff);
+    setReviewComments([]);
+    setCommentForm(initialCommentForm);
+    setEditingCommentId('');
   };
 
   useEffect(() => {
@@ -286,6 +359,126 @@ function ReviewExporterPage() {
     notify('パノラマ一覧CSVを書き出しました', 'success');
   };
 
+  const saveReviewComment = () => {
+    const normalizedComment = commentForm.comment.trim();
+    if (!normalizedComment) {
+      notify('レビューコメントを入力してください', 'warning');
+      return;
+    }
+
+    const target = commentTargetOptions.find((option) => option.key === commentForm.targetKey) ?? commentTargetOptions[0];
+    const now = new Date().toISOString();
+    if (editingCommentId) {
+      setReviewComments((current) =>
+        current.map((comment) =>
+          comment.id === editingCommentId
+            ? {
+                ...comment,
+                targetType: target.type,
+                targetId: target.id,
+                targetLabel: target.label,
+                category: commentForm.category,
+                priority: commentForm.priority,
+                status: commentForm.status,
+                comment: normalizedComment,
+                updatedAt: now,
+              }
+            : comment,
+        ),
+      );
+      notify('レビューコメントを更新しました', 'success');
+    } else {
+      setReviewComments((current) => [
+        ...current,
+        {
+          id: `comment-${String(current.length + 1).padStart(3, '0')}-${Date.now()}`,
+          targetType: target.type,
+          targetId: target.id,
+          targetLabel: target.label,
+          category: commentForm.category,
+          priority: commentForm.priority,
+          status: commentForm.status,
+          comment: normalizedComment,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]);
+      notify('レビューコメントを追加しました', 'success');
+    }
+    setCommentForm(initialCommentForm);
+    setEditingCommentId('');
+  };
+
+  const editReviewComment = (comment: ReviewComment) => {
+    setEditingCommentId(comment.id);
+    setCommentForm({
+      targetKey: `${comment.targetType}:${comment.targetId}`,
+      category: comment.category,
+      priority: comment.priority,
+      status: comment.status,
+      comment: comment.comment,
+    });
+  };
+
+  const deleteReviewComment = (commentId: string) => {
+    setReviewComments((current) => current.filter((comment) => comment.id !== commentId));
+    if (editingCommentId === commentId) {
+      setEditingCommentId('');
+      setCommentForm(initialCommentForm);
+    }
+    notify('レビューコメントを削除しました', 'success');
+  };
+
+  const exportReviewCommentsJson = () => {
+    downloadText(
+      'review-comments.json',
+      JSON.stringify(
+        {
+          projectName: projectData?.project.projectName ?? '',
+          exportedAt: new Date().toISOString(),
+          reviewComments,
+        },
+        null,
+        2,
+      ),
+      'application/json;charset=utf-8',
+    );
+    notify('レビューコメントを書き出しました', 'success');
+  };
+
+  const importReviewCommentsJson = async (fileList: FileList | null) => {
+    const file = fileList?.[0];
+    if (!file || getExtension(file.name) !== 'json') {
+      notify('レビューコメントを読み込めませんでした', 'error');
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(await file.text()) as { reviewComments?: Partial<ReviewComment>[] };
+      if (!Array.isArray(parsed.reviewComments)) {
+        throw new Error('reviewComments がありません。');
+      }
+      const now = new Date().toISOString();
+      setReviewComments(
+        parsed.reviewComments.map((comment, index) => ({
+          id: String(comment.id ?? `comment-${String(index + 1).padStart(3, '0')}`),
+          targetType: (comment.targetType === 'panorama' || comment.targetType === 'pin' || comment.targetType === 'general') ? comment.targetType : 'general',
+          targetId: String(comment.targetId ?? 'general'),
+          targetLabel: String(comment.targetLabel ?? '案件全体'),
+          category: reviewCategories.includes(comment.category as ReviewCommentCategory) ? comment.category as ReviewCommentCategory : 'その他',
+          priority: reviewPriorities.includes(comment.priority as ReviewCommentPriority) ? comment.priority as ReviewCommentPriority : '中',
+          status: reviewStatuses.includes(comment.status as ReviewCommentStatus) ? comment.status as ReviewCommentStatus : '未対応',
+          comment: String(comment.comment ?? ''),
+          createdAt: String(comment.createdAt ?? now),
+          updatedAt: String(comment.updatedAt ?? now),
+        })),
+      );
+      notify('レビューコメントを読み込みました', 'success');
+    } catch {
+      notify('レビューコメントを読み込めませんでした', 'error');
+    }
+  };
+
   return (
     <AppFrame toolName="レビュー書き出し" status="基本機能版">
       <section className="qaHero workspaceHero noPrint" aria-labelledby="review-exporter-title">
@@ -315,6 +508,20 @@ function ReviewExporterPage() {
           <button type="button" className="button buttonSecondary" onClick={exportPanoramaCsv} disabled={!projectData}>
             パノラマ一覧CSVを書き出し
           </button>
+          <button type="button" className="button buttonSecondary" onClick={exportReviewCommentsJson} disabled={reviewComments.length === 0}>
+            レビューコメントを書き出し
+          </button>
+          <label className="fileUploadButton secondaryUpload">
+            レビューコメントを読み込み
+            <input
+              type="file"
+              accept=".json,application/json"
+              onChange={(event) => {
+                void importReviewCommentsJson(event.target.files);
+                event.currentTarget.value = '';
+              }}
+            />
+          </label>
         </div>
       </section>
 
@@ -325,6 +532,13 @@ function ReviewExporterPage() {
         <article className={warningItems.length > 0 ? 'metricCard warningMetric' : 'metricCard successMetric'}>
           <span>注意項目</span><strong>{warningItems.length}</strong>
         </article>
+        <article className="metricCard"><span>コメント</span><strong>{reviewComments.length}</strong></article>
+        <article className={unresolvedCommentCount > 0 ? 'metricCard warningMetric' : 'metricCard successMetric'}>
+          <span>未対応</span><strong>{unresolvedCommentCount}</strong>
+        </article>
+        <article className={highPriorityCommentCount > 0 ? 'metricCard warningMetric' : 'metricCard successMetric'}>
+          <span>高優先度</span><strong>{highPriorityCommentCount}</strong>
+        </article>
       </section>
 
       {!projectData ? (
@@ -334,6 +548,83 @@ function ReviewExporterPage() {
           <p>案件パッケージ作成で出力した project.json または updated-project.json を読み込んでください。</p>
         </section>
       ) : (
+        <>
+        <section className="reviewCommentWorkspace noPrint">
+          <div className="reportSection">
+            <h2>レビューコメント</h2>
+            <p>レビューコメントはブラウザ内で処理され、外部には送信されません。</p>
+            <div className="commentFormGrid">
+              <label>
+                <span>対象</span>
+                <select value={commentForm.targetKey} onChange={(event) => setCommentForm({ ...commentForm, targetKey: event.target.value })}>
+                  {commentTargetOptions.map((option) => <option value={option.key} key={option.key}>{option.label}</option>)}
+                </select>
+              </label>
+              <label>
+                <span>種別</span>
+                <select value={commentForm.category} onChange={(event) => setCommentForm({ ...commentForm, category: event.target.value as ReviewCommentCategory })}>
+                  {reviewCategories.map((category) => <option value={category} key={category}>{category}</option>)}
+                </select>
+              </label>
+              <label>
+                <span>優先度</span>
+                <select value={commentForm.priority} onChange={(event) => setCommentForm({ ...commentForm, priority: event.target.value as ReviewCommentPriority })}>
+                  {reviewPriorities.map((priority) => <option value={priority} key={priority}>{priority}</option>)}
+                </select>
+              </label>
+              <label>
+                <span>対応状況</span>
+                <select value={commentForm.status} onChange={(event) => setCommentForm({ ...commentForm, status: event.target.value as ReviewCommentStatus })}>
+                  {reviewStatuses.map((status) => <option value={status} key={status}>{status}</option>)}
+                </select>
+              </label>
+              <label className="commentTextField">
+                <span>コメント本文</span>
+                <textarea value={commentForm.comment} onChange={(event) => setCommentForm({ ...commentForm, comment: event.target.value })} />
+              </label>
+            </div>
+            <div className="commentActions">
+              <button type="button" className="button buttonPrimary" onClick={saveReviewComment}>
+                {editingCommentId ? 'コメントを更新' : 'コメントを追加'}
+              </button>
+              {editingCommentId ? (
+                <button
+                  type="button"
+                  className="button buttonSecondary"
+                  onClick={() => {
+                    setEditingCommentId('');
+                    setCommentForm(initialCommentForm);
+                  }}
+                >
+                  編集をキャンセル
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="reportSection">
+            <h2>コメント一覧</h2>
+            {reviewComments.length === 0 ? <p>レビューコメントはまだありません。</p> : (
+              <div className="commentList">
+                {reviewComments.map((comment) => (
+                  <article className="commentCard" key={comment.id}>
+                    <div>
+                      <strong>{comment.targetLabel}</strong>
+                      <span>{comment.category} / 優先度: {comment.priority} / {comment.status}</span>
+                    </div>
+                    <p>{comment.comment}</p>
+                    <small>作成: {formatDate(comment.createdAt)} / 更新: {formatDate(comment.updatedAt)}</small>
+                    <div className="commentActions">
+                      <button type="button" className="tableButton" onClick={() => editReviewComment(comment)}>編集</button>
+                      <button type="button" className="tableButton dangerTableButton" onClick={() => deleteReviewComment(comment.id)}>削除</button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
         <section className="reviewReport" ref={reportRef} aria-label="レビュー書き出しレポート">
           {loadedFromHandoff ? <p className="handoffNotice noPrint">案件パッケージ作成から受け取ったデータです。</p> : null}
           <section className="reportSection reportCover">
@@ -427,6 +718,27 @@ function ReviewExporterPage() {
           </section>
 
           <section className="reportSection">
+            <h2>レビューコメント</h2>
+            {reviewComments.length === 0 ? <p>レビューコメントはまだありません。</p> : (
+              <table className="reportTable">
+                <thead><tr><th>対象</th><th>種別</th><th>優先度</th><th>対応状況</th><th>コメント</th><th>更新日時</th></tr></thead>
+                <tbody>
+                  {reviewComments.map((comment) => (
+                    <tr key={comment.id}>
+                      <td>{comment.targetLabel}</td>
+                      <td>{comment.category}</td>
+                      <td>{comment.priority}</td>
+                      <td>{comment.status}</td>
+                      <td>{comment.comment}</td>
+                      <td>{formatDate(comment.updatedAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
+
+          <section className="reportSection">
             <h2>データ情報</h2>
             <dl className="reportInfoList">
               <div><dt>読み込んだファイル名</dt><dd>{loadedFileName || '-'}</dd></div>
@@ -436,6 +748,7 @@ function ReviewExporterPage() {
             </dl>
           </section>
         </section>
+        </>
       )}
     </AppFrame>
   );

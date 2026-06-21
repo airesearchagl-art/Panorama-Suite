@@ -1520,6 +1520,99 @@ h1 {
   padding-left: 20px;
 }
 
+.reviewCommentWorkspace {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.commentFormGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.commentFormGrid label {
+  display: grid;
+  gap: 6px;
+}
+
+.commentFormGrid span {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.commentFormGrid input,
+.commentFormGrid select,
+.commentFormGrid textarea {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #111827;
+  color: var(--color-text-main);
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.commentTextField {
+  grid-column: 1 / -1;
+}
+
+.commentTextField textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.commentActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.commentList {
+  display: grid;
+  gap: 10px;
+}
+
+.commentCard {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  padding: 12px;
+}
+
+.commentCard strong,
+.commentCard span,
+.commentCard small {
+  display: block;
+}
+
+.commentCard span,
+.commentCard small {
+  color: var(--color-text-muted);
+}
+
+.commentCard p {
+  margin: 0;
+}
+
+.dangerTableButton {
+  border-color: var(--color-error);
+  background: var(--color-error);
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .commentFormGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media print {
   :root {
     --color-background: #ffffff;

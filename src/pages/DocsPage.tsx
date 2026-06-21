@@ -139,6 +139,18 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">レビューコメント</p>
+          <h2>コメントを入力して記録する</h2>
+          <ul className="docList">
+            <li>案件全体、パノラマ、平面図ピンを対象にコメントを追加できます。</li>
+            <li>種別、優先度、対応状況、コメント本文を入力します。</li>
+            <li>入力したコメントはレポート、HTML書き出し、印刷 / PDF保存に反映されます。</li>
+            <li>「レビューコメントを書き出し」から review-comments.json を保存できます。</li>
+            <li>保存済みの review-comments.json は「レビューコメントを読み込み」から再利用できます。</li>
+          </ul>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">Packager v0.3</p>
           <h2>平面図ピン情報をZIPに同梱する</h2>
           <ol className="docList">
