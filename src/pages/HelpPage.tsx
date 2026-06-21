@@ -6,9 +6,9 @@ function HelpPage() {
     <AppFrame toolName="Help" status="Guide">
       <section className="qaHero workspaceHero">
         <div>
-          <p className="eyebrow">Help / FAQ</p>
+          <p className="eyebrow">困ったときに見る</p>
           <h1>操作ヘルプ</h1>
-          <p className="lead">よくある操作、エラー時の確認ポイント、公開URLをまとめます。</p>
+          <p className="lead">読み込み、書き出し、サンプル案件、共有ZIPで迷ったときの確認ポイントをまとめます。</p>
         </div>
         <div className="securityPanel">
           <strong>🔒 ローカル処理</strong>
@@ -20,10 +20,12 @@ function HelpPage() {
         <article className="infoPanel">
           <h2>よくある操作</h2>
           <ul className="docList">
+            <li>まず試す場合は、はじめての使い方を開きます。</li>
             <li>画像はドラッグ＆ドロップ、またはファイル選択で追加します。</li>
             <li>QA結果はJSON/CSVで出力できます。</li>
             <li>案件パッケージ作成では、案件データファイル（project.json）を読み込んで再編集できます。</li>
             <li>パノラマ画像変換では、変換後画像を個別またはZIPで保存できます。</li>
+            <li>更新内容は RELEASE_NOTES.md を確認してください。</li>
           </ul>
         </article>
 
@@ -359,7 +361,7 @@ function HelpPage() {
 
         <article className="infoPanel">
           <h2>公開前に何を確認すればよいですか？</h2>
-          <p>パノラマが開けること、変換結果、案件情報、平面図ピン、レビュー情報、共有ZIP、share-index.html、share-manifest.jsonを確認してください。外部送信しないローカル共有であることも共有先に説明してください。</p>
+          <p>トップページ、チュートリアル、サンプル案件、各ページ移動、共有ZIP、share-index.html、share-manifest.jsonを確認してください。開発環境ではbuild成功と500kB超過警告なしも確認します。外部送信しないローカル共有であることも共有先に説明してください。</p>
         </article>
 
         <article className="infoPanel">

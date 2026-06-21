@@ -1,14 +1,14 @@
 import AppFrame from '../components/AppFrame';
-import { publicUrls } from '../data/publicInfo';
+import { appVersion, publicUrls } from '../data/publicInfo';
 
 function DocsPage() {
   return (
     <AppFrame toolName="使い方ガイド" status="ガイド">
       <section className="qaHero workspaceHero">
         <div>
-          <p className="eyebrow">使い方ガイド / ドキュメント</p>
+          <p className="eyebrow">仕様・構成を確認する</p>
           <h1>Panorama Suite Manual</h1>
-          <p className="lead">Panorama Suite の概要、公開URL、ツールの役割、基本フロー、セキュリティ方針をまとめます。</p>
+          <p className="lead">Panorama Suite の仕様、構成、公開URL、ローカル処理の考え方を確認するページです。</p>
         </div>
         <div className="securityPanel">
           <strong>公開URL</strong>
@@ -17,7 +17,7 @@ function DocsPage() {
       </section>
 
       <section className="dashboardGrid">
-        <article className="metricCard"><span>バージョン</span><strong>v0.1.0</strong></article>
+        <article className="metricCard"><span>バージョン</span><strong>{appVersion}</strong></article>
         <article className="metricCard"><span>基本機能版</span><strong>8</strong></article>
         <article className="metricCard successMetric"><span>処理方式</span><strong>ローカル</strong></article>
         <article className="metricCard"><span>公開先</span><strong>Vercel</strong></article>
@@ -28,6 +28,7 @@ function DocsPage() {
           <p className="sectionKicker">Overview</p>
           <h2>Panorama Suite 概要</h2>
           <p>建築設計・施工管理で扱う360度パノラマ画像の品質確認、変換、案件パッケージ化を一つのワークスペースに統合します。</p>
+          <p>更新内容はリポジトリの RELEASE_NOTES.md にまとめています。</p>
         </article>
 
         <article className="infoPanel">
@@ -65,8 +66,8 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
-          <p className="sectionKicker">Tutorial v1.6</p>
-          <h2>はじめての使い方</h2>
+          <p className="sectionKicker">Tutorial</p>
+          <h2>まず試す</h2>
           <ol className="docList">
             <li>Portalの「はじめての方へ」から `/tutorial` を開く。</li>
             <li>品質チェック、画像変換、案件パッケージ作成、平面図ピン配置、レビュー書き出し、共有ZIP作成の順番を確認する。</li>
@@ -76,7 +77,7 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
-          <p className="sectionKicker">v1.7 Sample Run</p>
+          <p className="sectionKicker">Sample Run</p>
           <h2>サンプル案件を完走する</h2>
           <ol className="docList">
             <li>PortalまたはTutorialで「サンプル案件を読み込む」を押す。</li>
@@ -90,6 +91,10 @@ function DocsPage() {
           <p className="sectionKicker">公開前チェック</p>
           <h2>共有前に確認すること</h2>
           <ul className="docList">
+            <li>トップページが開ける。</li>
+            <li>チュートリアルに行ける。</li>
+            <li>サンプル案件を読み込める。</li>
+            <li>各ページに移動できる。</li>
             <li>パノラマ画像が開ける。</li>
             <li>変換結果を確認できる。</li>
             <li>案件情報が整理されている。</li>
@@ -98,6 +103,8 @@ function DocsPage() {
             <li>Share HubでZIPを書き出せる。</li>
             <li>share-index.htmlをブラウザで開ける。</li>
             <li>share-manifest.jsonに案件情報が入っている。</li>
+            <li>buildが成功する。</li>
+            <li>Viteの500kB超過警告が出ない。</li>
             <li>外部送信しないローカル共有であることを確認する。</li>
           </ul>
         </article>

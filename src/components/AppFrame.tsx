@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { enabledTools, tools } from '../data/tools';
+import { appVersion } from '../data/publicInfo';
 
 const guideToolIds = new Set(['documentation', 'help', 'design-system']);
 
@@ -12,7 +13,7 @@ type AppFrameProps = {
   sidebar?: ReactNode;
 };
 
-function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: AppFrameProps) {
+function AppFrame({ toolName, status, version = appVersion, children, sidebar }: AppFrameProps) {
   return (
     <div className="suiteFrame">
       <header className="suiteHeader">
@@ -30,6 +31,9 @@ function AppFrame({ toolName, status, version = 'v0.1.0', children, sidebar }: A
           <span className="localPill">🔒 ローカル処理</span>
         </div>
         <div className="suiteToolbar" aria-label="ツールバー">
+          <Link to="/tutorial" className="button buttonPrimary">
+            はじめての方へ
+          </Link>
           <Link to="/docs" className="button buttonSecondary">
             📖 使い方
           </Link>

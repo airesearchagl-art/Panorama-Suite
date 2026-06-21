@@ -138,7 +138,7 @@ function PortalPage() {
           <div>
             <p className="sectionKicker">はじめての方へ</p>
             <h2>Panorama Suiteの使う順番を確認できます</h2>
-            <p>品質チェックから共有ZIP作成まで、サンプル案件を見ながら基本フローを確認できます。</p>
+            <p>初めて見るユーザーでも、サンプル案件を使ってShare Hubの共有ZIP作成まで進めます。</p>
           </div>
           <div className="bannerActions">
             <Link to="/tutorial" className="button buttonPrimary">チュートリアルを見る</Link>
@@ -152,7 +152,7 @@ function PortalPage() {
         <div>
           <p className="eyebrow">Information First / Workspace Style</p>
           <h1 id="page-title">Panorama Suite Portal</h1>
-          <p className="lead">360°パノラマ業務を、品質確認、変換、案件管理、共有、レビューへつなぐ作業空間です。</p>
+          <p className="lead">360°パノラマ業務を、品質確認、変換、案件管理、平面図ピン配置、レビュー、共有ZIP作成までつなぐ公開用ワークスペースです。</p>
         </div>
         <div className="securityPanel">
           <strong>🔒 ローカル処理</strong>
@@ -172,7 +172,7 @@ function PortalPage() {
         <article className="infoPanel tutorialIntroCard">
           <p className="sectionKicker">Tutorial</p>
           <h2>はじめての方へ</h2>
-          <p>何をするツールか、どの順番で使うか、サンプル案件でどう試すかを確認できます。</p>
+          <p>まずここから始めてください。目的、使う順番、サンプル案件、共有ZIPの流れを確認できます。</p>
           <Link to="/tutorial" className="button buttonPrimary">はじめての使い方を開く</Link>
         </article>
         <article className="infoPanel">

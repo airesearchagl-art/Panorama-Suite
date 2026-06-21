@@ -1,4 +1,4 @@
-export const appVersion = 'v0.1.0';
+export const appVersion = 'v1.8';
 
 export const publicUrls = {
   portal: 'https://panorama-suite.vercel.app/',

@@ -61,13 +61,13 @@ function TutorialPage() {
   };
 
   return (
-    <AppFrame toolName="はじめての使い方" status="v1.7">
+    <AppFrame toolName="はじめての使い方" status="v1.8">
       <section className="heroSection workspaceHero" aria-labelledby="tutorial-title">
         <div>
-          <p className="eyebrow">User Tutorial / Sample Workflow</p>
+          <p className="eyebrow">まず試す / Sample Workflow</p>
           <h1 id="tutorial-title">はじめての使い方</h1>
           <p className="lead">
-            Panorama Suiteは、360°パノラマ画像を品質確認、変換、案件整理、平面図ピン配置、レビュー、共有ZIP作成までつなげる業務ツールです。
+            Panorama Suiteを公開URLで初めて開いたら、まずこのページで目的、使う順番、サンプル案件、共有ZIP作成までの流れを確認してください。
           </p>
         </div>
         <div className="securityPanel">
