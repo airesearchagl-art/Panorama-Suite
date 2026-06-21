@@ -10,6 +10,7 @@ import HelpPage from './pages/HelpPage';
 import PanoramaConverterPage from './pages/PanoramaConverterPage';
 import PanoramaQaPage from './pages/PanoramaQaPage';
 import ProjectPackagerPage from './pages/ProjectPackagerPage';
+import ReviewExporterPage from './pages/ReviewExporterPage';
 
 const statusTone: Record<ToolAvailability, string> = {
   available: 'statusAvailable',
@@ -244,6 +245,7 @@ function App() {
         <Route path="/packager" element={<ProjectPackagerPage />} />
         <Route path="/converter" element={<PanoramaConverterPage />} />
         <Route path="/floormap" element={<FloorMapBuilderPage />} />
+        <Route path="/review-exporter" element={<ReviewExporterPage />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/docs/design-system" element={<DesignSystemPage />} />

@@ -197,6 +197,36 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>レビュー書き出しとは何ですか？</h2>
+          <p>案件データファイルを読み込み、案件概要、パノラマ一覧、平面図ピン情報、QA結果、注意事項をまとめたレビュー用HTMLレポートを作る機能です。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>PDF保存する方法</h2>
+          <p>レビュー書き出しページで「印刷 / PDF保存」を押し、ブラウザの印刷画面で保存先をPDFにしてください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>レビュー書き出しで案件データを読み込めない場合</h2>
+          <p>project または panoramas が含まれる project.json / updated-project.json か確認してください。JSON形式が壊れている場合は読み込めません。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>QA結果が表示されない場合</h2>
+          <p>案件データ内に qa.summary が含まれていない場合は「QA結果は読み込まれていません」と表示されます。先に品質チェック結果を案件パッケージ作成へ読み込んでください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>レビュー書き出しの注意事項が表示された場合</h2>
+          <p>場所名未入力、QA Error、未割当ピン、平面図画像未登録などを示しています。提出前に案件パッケージ作成や平面図ピン配置で修正してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>印刷時にレイアウトが崩れる場合</h2>
+          <p>ブラウザの印刷設定で用紙をA4、余白を標準または狭い、背景グラフィックを必要に応じて有効にしてください。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>準備中表示の意味</h2>
           <p>準備中、開発中、構想中、将来予定のツールはまだ利用できません。カードはグレーアウトされ、クリック操作も無効です。</p>
         </article>
@@ -219,6 +249,7 @@ function HelpPage() {
             <li>Packager: <a href={publicUrls.packager}>{publicUrls.packager}</a></li>
             <li>Converter: <a href={publicUrls.converter}>{publicUrls.converter}</a></li>
             <li>平面図ピン配置: <a href={publicUrls.floormap}>{publicUrls.floormap}</a></li>
+            <li>レビュー書き出し: <a href={publicUrls.reviewExporter}>{publicUrls.reviewExporter}</a></li>
           </ul>
         </article>
 

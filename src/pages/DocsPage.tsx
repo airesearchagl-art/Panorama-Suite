@@ -39,6 +39,7 @@ function DocsPage() {
             <li>案件パッケージ作成: <a href={publicUrls.packager}>{publicUrls.packager}</a></li>
             <li>パノラマ画像変換: <a href={publicUrls.converter}>{publicUrls.converter}</a></li>
             <li>平面図ピン配置: <a href={publicUrls.floormap}>{publicUrls.floormap}</a></li>
+            <li>レビュー書き出し: <a href={publicUrls.reviewExporter}>{publicUrls.reviewExporter}</a></li>
           </ul>
         </article>
 
@@ -51,6 +52,7 @@ function DocsPage() {
             <li>案件パッケージ作成: 画像、平面図、管理情報をZIPにまとめます。</li>
             <li>パノラマ画像変換: 画像形式、画質、サイズを変換します。</li>
             <li>平面図ピン配置: 平面図上にパノラマ撮影位置を配置します。</li>
+            <li>レビュー書き出し: 案件データを読み込み、印刷・PDF保存しやすいHTMLレポートを作成します。</li>
           </ul>
         </article>
 
@@ -125,6 +127,18 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">レビュー書き出し</p>
+          <h2>レビュー用レポートを作成する</h2>
+          <ol className="docList">
+            <li>案件データファイル（project.json / updated-project.json）を読み込む。</li>
+            <li>案件概要、パノラマ一覧、平面図ピン情報、QA結果、注意事項を確認する。</li>
+            <li>「印刷 / PDF保存」からブラウザ印刷を開き、PDFとして保存する。</li>
+            <li>必要に応じて HTML またはパノラマ一覧CSVを書き出す。</li>
+            <li>案件パッケージ作成の「レビュー書き出しへ送る」から直接開くこともできます。</li>
+          </ol>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">Packager v0.3</p>
           <h2>平面図ピン情報をZIPに同梱する</h2>
           <ol className="docList">
@@ -194,6 +208,7 @@ function DocsPage() {
             <li>更新済み案件データを書き出す。</li>
             <li>案件パッケージ作成で再読み込みする。</li>
             <li>ZIPとして保存する。</li>
+            <li>レビュー書き出しでレポートを確認し、印刷 / PDF保存する。</li>
             <li>レビュー・共有・アーカイブへ展開する。</li>
           </ol>
         </article>

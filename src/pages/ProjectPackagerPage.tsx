@@ -7,6 +7,7 @@ import {
   clearUpdatedProjectHandoff,
   loadUpdatedProjectHandoff,
   projectHandoffStorageKey,
+  saveReviewProjectHandoff,
 } from '../data/handoff';
 
 type ProjectForm = {
@@ -855,6 +856,17 @@ function ProjectPackagerPage() {
     navigate('/floormap');
   };
 
+  const handOffToReviewExporter = () => {
+    const projectData = buildProjectJson();
+    saveReviewProjectHandoff({
+      ...projectData,
+      createdAt: new Date().toISOString(),
+      source: 'packager',
+    });
+    notify('案件データをレビュー書き出しへ渡しました', 'success');
+    navigate('/review-exporter');
+  };
+
   const clearReceivedUpdatedProject = () => {
     clearUpdatedProjectHandoff();
     setReceivedUpdatedProject(null);
@@ -1288,6 +1300,16 @@ function ProjectPackagerPage() {
           </div>
           <button type="button" className="button buttonPrimary" onClick={handOffToFloorMap}>
             平面図ピン配置へ送る
+          </button>
+        </div>
+        <div className="nextActionPanel">
+          <div>
+            <p className="sectionKicker">レビュー</p>
+            <h2>レビュー用レポートを作成する</h2>
+            <p>現在の案件データをレビュー書き出しへ送り、印刷・PDF保存しやすいHTMLレポートを作成できます。</p>
+          </div>
+          <button type="button" className="button buttonSecondary" onClick={handOffToReviewExporter}>
+            レビュー書き出しへ送る
           </button>
         </div>
         {form.projectName.trim().length === 0 ? <p>案件名を入力するとZIP出力できます。</p> : null}
