@@ -140,6 +140,19 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">戻し連携</p>
+          <h2>平面図ピン配置から案件パッケージ作成へ戻す</h2>
+          <ol className="docList">
+            <li>平面図ピン配置でピンを配置・編集する。</li>
+            <li>「案件パッケージ作成へ戻す」を押す。</li>
+            <li>更新済み案件データがブラウザ内の一時データとして保存され、案件パッケージ作成へ移動する。</li>
+            <li>案件パッケージ作成では、平面図ピン配置から受け取ったデータとして自動読み込みされる。</li>
+            <li>画像ファイル本体は受け渡し対象外です。ZIPに含めるには、同名のパノラマ画像・平面図画像を必要に応じて再登録してください。</li>
+            <li>手動で進める場合は、平面図ピン配置で更新済み案件データ（updated-project.json）を書き出し、案件パッケージ作成で読み込めます。</li>
+          </ol>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">External Tools</p>
           <h2>既存外部ツール</h2>
           <ul className="docList">

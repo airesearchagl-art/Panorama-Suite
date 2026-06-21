@@ -152,6 +152,21 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>平面図ピン配置から戻したのに画像がZIPに入らない場合</h2>
+          <p>「案件パッケージ作成へ戻す」で渡るのは案件情報と平面図ピン情報です。画像ファイル本体は渡らないため、ZIPに含めたい画像は案件パッケージ作成で同じファイル名の画像を再登録してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>受け取ったデータをクリアする方法</h2>
+          <p>案件パッケージ作成に表示される「受け取ったデータをクリア」を押すと、平面図ピン配置から戻した一時データを削除できます。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>手動で updated-project.json を読み込む方法</h2>
+          <p>平面図ピン配置で「更新済み案件データ」を書き出し、案件パッケージ作成の「案件データファイルを読み込む」から updated-project.json を選択してください。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>案件データは渡るのに画像本体が渡らない理由</h2>
           <p>画像ファイルは容量が大きく、ブラウザ内の一時保存に向きません。安全性と安定性を優先し、受け渡し対象は管理情報とJSON相当のデータに限定しています。</p>
         </article>

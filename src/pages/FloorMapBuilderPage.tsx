@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
-import { projectHandoffStorageKey } from '../data/handoff';
+import { projectHandoffStorageKey, saveUpdatedProjectHandoff } from '../data/handoff';
 
 type ProjectInfo = Record<string, unknown>;
 
@@ -170,6 +171,7 @@ function createFloorMapFromUpload(file: File, previewUrl: string): UploadedFloor
 
 function FloorMapBuilderPage() {
   const { notify } = useToast();
+  const navigate = useNavigate();
   const handoffLoadedRef = useRef(false);
   const [sourceProject, setSourceProject] = useState<SourceProject | null>(null);
   const [floorMap, setFloorMap] = useState<UploadedFloorMap | null>(null);
@@ -357,6 +359,22 @@ function FloorMapBuilderPage() {
     notify('更新済み案件データを書き出しました', 'success');
   };
 
+  const returnToPackager = () => {
+    if (!sourceProject && activeFloorMaps.length === 0) {
+      notify('案件データがないため、戻す内容がありません', 'warning');
+      return;
+    }
+
+    const updatedProject = buildUpdatedProject();
+    saveUpdatedProjectHandoff({
+      ...updatedProject,
+      createdAt: new Date().toISOString(),
+      source: 'floormap',
+    });
+    notify('更新済み案件データを案件パッケージ作成へ渡しました', 'success');
+    navigate('/packager');
+  };
+
   return (
     <AppFrame toolName="平面図ピン配置" status="基本機能版">
       <section className="qaHero workspaceHero" aria-labelledby="floormap-title">
@@ -376,6 +394,9 @@ function FloorMapBuilderPage() {
           </button>
           <button type="button" className="button buttonPrimary" onClick={exportUpdatedProjectJson} disabled={!sourceProject}>
             更新済み案件データ
+          </button>
+          <button type="button" className="button buttonSecondary" onClick={returnToPackager}>
+            案件パッケージ作成へ戻す
           </button>
         </div>
       </section>

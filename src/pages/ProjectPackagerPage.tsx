@@ -1,9 +1,13 @@
 import JSZip from 'jszip';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
-import { projectHandoffStorageKey } from '../data/handoff';
+import {
+  clearUpdatedProjectHandoff,
+  loadUpdatedProjectHandoff,
+  projectHandoffStorageKey,
+} from '../data/handoff';
 
 type ProjectForm = {
   projectName: string;
@@ -288,6 +292,7 @@ function downloadBlob(blob: Blob, fileName: string) {
 function ProjectPackagerPage() {
   const { notify } = useToast();
   const navigate = useNavigate();
+  const updatedProjectHandoffLoadedRef = useRef(false);
   const [form, setForm] = useState<ProjectForm>({
     projectName: '',
     clientName: '',
@@ -303,6 +308,7 @@ function ProjectPackagerPage() {
   const [qaFile, setQaFile] = useState<File | null>(null);
   const [qaResultPath, setQaResultPath] = useState('');
   const [importedProject, setImportedProject] = useState<ImportedProject | null>(null);
+  const [receivedUpdatedProject, setReceivedUpdatedProject] = useState<{ createdAt: string; source: string } | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
   const [isPackaging, setIsPackaging] = useState(false);
 
@@ -335,6 +341,88 @@ function ProjectPackagerPage() {
       current.map((panorama) => (panorama.id === id ? { ...panorama, [key]: value } : panorama)),
     );
   };
+
+  const applyProjectJson = (parsed: ProjectJson, message: string) => {
+    const importedSummary = normalizeQaSummary(parsed.qa?.summary);
+    setForm({
+      projectName: parsed.project.projectName ?? '',
+      clientName: parsed.project.clientName ?? '',
+      manager: parsed.project.manager ?? '',
+      purpose: parsed.project.purpose ?? '',
+      description: parsed.project.description ?? '',
+    });
+    setPanoramas(
+      parsed.panoramas.map((panorama, index) => ({
+        id: String(panorama.id ?? createIdFromName('imported-panorama', panorama.fileName ?? `panorama-${index + 1}`, index)),
+        fileName: String(panorama.fileName ?? ''),
+        path: String(panorama.path ?? `panoramas/${panorama.fileName ?? ''}`),
+        fileType: String(panorama.fileType ?? getExtension(String(panorama.fileName ?? ''))),
+        fileSize: Number(panorama.fileSize ?? 0),
+        width: Number(panorama.width ?? 0),
+        height: Number(panorama.height ?? 0),
+        floor: String(panorama.floor ?? ''),
+        locationName: String(panorama.locationName ?? ''),
+        direction: normalizeDirection(Number(panorama.direction ?? 0)),
+        sceneType: String(panorama.sceneType ?? ''),
+        note: String(panorama.note ?? ''),
+        sortOrder: normalizeSortOrder(Number(panorama.sortOrder ?? index + 1), index + 1),
+        qaStatus: String(panorama.qaStatus ?? ''),
+        fileState: 'ファイル未再登録',
+      })),
+    );
+    setFloorplans(
+      parsed.floorplans.map((floorplan, index) => ({
+        id: String(floorplan.id ?? createIdFromName('imported-floorplan', floorplan.fileName ?? `floorplan-${index + 1}`, index)),
+        fileName: String(floorplan.fileName ?? ''),
+        path: String(floorplan.path ?? `floorplans/${floorplan.fileName ?? ''}`),
+        fileType: String(floorplan.fileType ?? getExtension(String(floorplan.fileName ?? ''))),
+        fileSize: Number(floorplan.fileSize ?? 0),
+        level: String(floorplan.level ?? ''),
+        description: String(floorplan.description ?? ''),
+        fileState: 'ファイル未再登録',
+      })),
+    );
+    setFloorMaps(normalizeFloorMaps(parsed.floorMaps));
+    setQaRows([]);
+    setQaSummary(importedSummary);
+    setQaFile(null);
+    setQaResultPath(parsed.qa?.resultPath ?? '');
+    setImportedProject({
+      schemaVersion: parsed.schemaVersion,
+      importedAt: new Date().toISOString(),
+      resultPath: parsed.qa?.resultPath ?? '',
+    });
+    setMessages([message]);
+  };
+
+  useEffect(() => {
+    if (updatedProjectHandoffLoadedRef.current) {
+      return;
+    }
+
+    updatedProjectHandoffLoadedRef.current = true;
+    try {
+      const handoff = loadUpdatedProjectHandoff<ProjectJson & { createdAt?: string; source?: string }>();
+      if (!handoff) {
+        return;
+      }
+
+      const parsed = validateProjectJson(handoff);
+      const normalizedFloorMaps = normalizeFloorMaps(parsed.floorMaps);
+      applyProjectJson(parsed, '平面図ピン配置から受け取ったデータです。画像ファイル本体は受け渡し対象外です。ZIPに含めるには、必要に応じて同名ファイルを再登録してください。');
+      setReceivedUpdatedProject({
+        createdAt: handoff.createdAt ?? new Date().toISOString(),
+        source: handoff.source ?? 'floormap',
+      });
+      notify('更新済み案件データを読み込みました', 'success');
+      if (normalizedFloorMaps.some((floorMap) => floorMap.imageFileName)) {
+        notify('平面図画像の再登録が必要です', 'warning');
+      }
+    } catch (error) {
+      setMessages([error instanceof Error ? error.message : '更新済み案件データを読み込めませんでした。']);
+      notify('更新済み案件データを読み込めませんでした', 'error');
+    }
+  }, [notify]);
 
   const addPanoramas = async (fileList: FileList | null) => {
     if (!fileList) {
@@ -497,58 +585,8 @@ function ProjectPackagerPage() {
 
     try {
       const parsed = validateProjectJson(JSON.parse(await file.text()) as unknown);
-      const importedSummary = normalizeQaSummary(parsed.qa?.summary);
-      setForm({
-        projectName: parsed.project.projectName ?? '',
-        clientName: parsed.project.clientName ?? '',
-        manager: parsed.project.manager ?? '',
-        purpose: parsed.project.purpose ?? '',
-        description: parsed.project.description ?? '',
-      });
-      setPanoramas(
-        parsed.panoramas.map((panorama, index) => ({
-          id: String(panorama.id ?? createIdFromName('imported-panorama', panorama.fileName ?? `panorama-${index + 1}`, index)),
-          fileName: String(panorama.fileName ?? ''),
-          path: String(panorama.path ?? `panoramas/${panorama.fileName ?? ''}`),
-          fileType: String(panorama.fileType ?? getExtension(String(panorama.fileName ?? ''))),
-          fileSize: Number(panorama.fileSize ?? 0),
-          width: Number(panorama.width ?? 0),
-          height: Number(panorama.height ?? 0),
-          floor: String(panorama.floor ?? ''),
-          locationName: String(panorama.locationName ?? ''),
-          direction: normalizeDirection(Number(panorama.direction ?? 0)),
-          sceneType: String(panorama.sceneType ?? ''),
-          note: String(panorama.note ?? ''),
-          sortOrder: normalizeSortOrder(Number(panorama.sortOrder ?? index + 1), index + 1),
-          qaStatus: String(panorama.qaStatus ?? ''),
-          fileState: 'ファイル未再登録',
-        })),
-      );
-      setFloorplans(
-        parsed.floorplans.map((floorplan, index) => ({
-          id: String(floorplan.id ?? createIdFromName('imported-floorplan', floorplan.fileName ?? `floorplan-${index + 1}`, index)),
-          fileName: String(floorplan.fileName ?? ''),
-          path: String(floorplan.path ?? `floorplans/${floorplan.fileName ?? ''}`),
-          fileType: String(floorplan.fileType ?? getExtension(String(floorplan.fileName ?? ''))),
-          fileSize: Number(floorplan.fileSize ?? 0),
-          level: String(floorplan.level ?? ''),
-          description: String(floorplan.description ?? ''),
-          fileState: 'ファイル未再登録',
-        })),
-      );
-      setFloorMaps(normalizeFloorMaps(parsed.floorMaps));
-      setQaRows([]);
-      setQaSummary(importedSummary);
-      setQaFile(null);
-      setQaResultPath(parsed.qa?.resultPath ?? '');
-      setImportedProject({
-        schemaVersion: parsed.schemaVersion,
-        importedAt: new Date().toISOString(),
-        resultPath: parsed.qa?.resultPath ?? '',
-      });
-      setMessages([
-        `${file.name}: 案件データファイル（project.json）を読み込みました。実画像ファイルは復元されないため、同名ファイルを再登録してください。`,
-      ]);
+      applyProjectJson(parsed, `${file.name}: 案件データファイル（project.json）を読み込みました。実画像ファイルは復元されないため、同名ファイルを再登録してください。`);
+      setReceivedUpdatedProject(null);
       notify('案件データファイルを読み込みました', 'success');
     } catch (error) {
       setMessages([error instanceof Error ? error.message : '案件データファイルを読み込めません。']);
@@ -708,6 +746,12 @@ function ProjectPackagerPage() {
     navigate('/floormap');
   };
 
+  const clearReceivedUpdatedProject = () => {
+    clearUpdatedProjectHandoff();
+    setReceivedUpdatedProject(null);
+    notify('受け取ったデータをクリアしました', 'success');
+  };
+
   return (
     <AppFrame toolName="案件パッケージ作成" status="基本機能版 v0.3">
       <section className="qaHero workspaceHero" aria-labelledby="packager-title">
@@ -754,6 +798,24 @@ function ProjectPackagerPage() {
           <div><span>データ形式</span><strong>{importedProject.schemaVersion}</strong></div>
           <div><span>QA結果パス</span><strong>{importedProject.resultPath || '-'}</strong></div>
           <div><span>未再登録ファイル</span><strong>{missingPanoramas.length + missingFloorplans.length}</strong></div>
+        </section>
+      ) : null}
+
+      {receivedUpdatedProject ? (
+        <section className="handoffPanel" aria-label="平面図ピン配置から受け取ったデータ">
+          <div>
+            <p className="sectionKicker">受け取りデータ</p>
+            <h2>平面図ピン配置から受け取ったデータです</h2>
+            <p>画像ファイル本体は受け渡し対象外です。ZIPに含めるには、必要に応じて同名ファイルを再登録してください。</p>
+          </div>
+          <div className="handoffSummary">
+            <div><span>データ元</span><strong>{receivedUpdatedProject.source === 'floormap' ? '平面図ピン配置' : receivedUpdatedProject.source}</strong></div>
+            <div><span>平面図ピン情報</span><strong>{floorMaps.length}</strong></div>
+            <div><span>ピン</span><strong>{floorMapPinCount}</strong></div>
+          </div>
+          <button type="button" className="button buttonSecondary" onClick={clearReceivedUpdatedProject}>
+            受け取ったデータをクリア
+          </button>
         </section>
       ) : null}
 
@@ -854,6 +916,11 @@ function ProjectPackagerPage() {
               <div className="missingNotice">
                 <strong>実ファイル再登録が必要です。</strong>
                 <span>未再登録の項目は案件データファイル / 平面図ピン情報には残りますが、ZIP内に実ファイルは含まれません。</span>
+                {missingFloorMapImages.length > 0 ? (
+                  <span>
+                    平面図画像が未登録です: {missingFloorMapImages.map((floorMap) => floorMap.imageFileName).join('、')} を再登録してください。同じファイル名の画像を登録すると、ZIPに含められます。
+                  </span>
+                ) : null}
               </div>
             ) : null}
 
