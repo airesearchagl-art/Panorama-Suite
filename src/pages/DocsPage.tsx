@@ -188,9 +188,23 @@ function DocsPage() {
             <li>案件データファイル（project.json / updated-project.json）を読み込む。</li>
             <li>案件概要、パノラマ数、平面図数、平面図ピン数を確認する。</li>
             <li>共有用メモを入力する。</li>
-            <li>share-manifest.json と share-index.html を書き出す。</li>
+            <li>共有対象ファイルを追加する。</li>
+            <li>share-manifest.json、share-index.html、または共有ZIPを書き出す。</li>
           </ol>
           <p>基本機能版ではクラウド共有リンク発行、アップロード、外部サーバー連携は行いません。</p>
+        </article>
+
+        <article className="infoPanel">
+          <p className="sectionKicker">共有ZIP</p>
+          <h2>共有ZIPを作る</h2>
+          <ol className="docList">
+            <li>共有対象ファイル登録エリアへ、project.json、updated-project.json、review-report.html、画像、CSVなどを追加する。</li>
+            <li>「共有ZIPを書き出し」を押す。</li>
+            <li>ZIP内には share-manifest.json、share-index.html、files/ 配下の登録ファイルが入ります。</li>
+            <li>share-manifest.json は案件名、作成日時、共有メモ、件数サマリー、同梱ファイル一覧を記録します。</li>
+            <li>share-index.html は共有内容をブラウザで確認するための簡易HTMLです。</li>
+          </ol>
+          <p>共有ZIPはローカルで作成されます。外部送信やクラウドアップロードは行いません。</p>
         </article>
 
         <article className="infoPanel">

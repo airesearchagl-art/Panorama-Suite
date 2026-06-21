@@ -2332,6 +2332,15 @@ h1 {
   opacity: 0.42;
 }
 
+.pageLoading {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  background: var(--color-background);
+  color: var(--color-text-main);
+  font-weight: 700;
+}
+
 .thumbnailGrid {
   display: grid;
   gap: 16px;

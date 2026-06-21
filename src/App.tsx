@@ -1,19 +1,20 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import AppFrame from './components/AppFrame';
 import { ToastProvider, useToast } from './components/ToastProvider';
 import { availabilityLabels, categories, getCategoryLabel, tools, type Tool, type ToolAvailability, type ToolCategory } from './data/tools';
-import DesignSystemPage from './pages/DesignSystemPage';
-import DocsPage from './pages/DocsPage';
-import FloorMapBuilderPage from './pages/FloorMapBuilderPage';
-import HelpPage from './pages/HelpPage';
-import PanoramaConverterPage from './pages/PanoramaConverterPage';
-import PanoramaDiffPage from './pages/PanoramaDiffPage';
-import PanoramaQaPage from './pages/PanoramaQaPage';
-import ProjectPackagerPage from './pages/ProjectPackagerPage';
-import ReviewExporterPage from './pages/ReviewExporterPage';
-import ShareHubPage from './pages/ShareHubPage';
-import ThumbnailGeneratorPage from './pages/ThumbnailGeneratorPage';
+
+const DesignSystemPage = lazy(() => import('./pages/DesignSystemPage'));
+const DocsPage = lazy(() => import('./pages/DocsPage'));
+const FloorMapBuilderPage = lazy(() => import('./pages/FloorMapBuilderPage'));
+const HelpPage = lazy(() => import('./pages/HelpPage'));
+const PanoramaConverterPage = lazy(() => import('./pages/PanoramaConverterPage'));
+const PanoramaDiffPage = lazy(() => import('./pages/PanoramaDiffPage'));
+const PanoramaQaPage = lazy(() => import('./pages/PanoramaQaPage'));
+const ProjectPackagerPage = lazy(() => import('./pages/ProjectPackagerPage'));
+const ReviewExporterPage = lazy(() => import('./pages/ReviewExporterPage'));
+const ShareHubPage = lazy(() => import('./pages/ShareHubPage'));
+const ThumbnailGeneratorPage = lazy(() => import('./pages/ThumbnailGeneratorPage'));
 
 const statusTone: Record<ToolAvailability, string> = {
   available: 'statusAvailable',
@@ -242,20 +243,22 @@ function PortalPage() {
 function App() {
   return (
     <ToastProvider>
-      <Routes>
-        <Route path="/" element={<PortalPage />} />
-        <Route path="/qa" element={<PanoramaQaPage />} />
-        <Route path="/packager" element={<ProjectPackagerPage />} />
-        <Route path="/converter" element={<PanoramaConverterPage />} />
-        <Route path="/floormap" element={<FloorMapBuilderPage />} />
-        <Route path="/review-exporter" element={<ReviewExporterPage />} />
-        <Route path="/thumbnail-generator" element={<ThumbnailGeneratorPage />} />
-        <Route path="/panorama-diff" element={<PanoramaDiffPage />} />
-        <Route path="/share-hub" element={<ShareHubPage />} />
-        <Route path="/docs" element={<DocsPage />} />
-        <Route path="/help" element={<HelpPage />} />
-        <Route path="/docs/design-system" element={<DesignSystemPage />} />
-      </Routes>
+      <Suspense fallback={<div className="pageLoading">ページを読み込んでいます...</div>}>
+        <Routes>
+          <Route path="/" element={<PortalPage />} />
+          <Route path="/qa" element={<PanoramaQaPage />} />
+          <Route path="/packager" element={<ProjectPackagerPage />} />
+          <Route path="/converter" element={<PanoramaConverterPage />} />
+          <Route path="/floormap" element={<FloorMapBuilderPage />} />
+          <Route path="/review-exporter" element={<ReviewExporterPage />} />
+          <Route path="/thumbnail-generator" element={<ThumbnailGeneratorPage />} />
+          <Route path="/panorama-diff" element={<PanoramaDiffPage />} />
+          <Route path="/share-hub" element={<ShareHubPage />} />
+          <Route path="/docs" element={<DocsPage />} />
+          <Route path="/help" element={<HelpPage />} />
+          <Route path="/docs/design-system" element={<DesignSystemPage />} />
+        </Routes>
+      </Suspense>
     </ToastProvider>
   );
 }

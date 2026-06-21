@@ -307,6 +307,31 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>共有ZIPとは何ですか？</h2>
+          <p>共有メモ、共有用データ、確認用HTML、登録した補助ファイルを1つにまとめたZIPです。ローカルで作成され、クラウド共有リンクは発行しません。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>共有対象ファイルを追加する方法</h2>
+          <p>共有パッケージ作成ページの「共有対象ファイル登録」にドラッグ＆ドロップするか、クリックして複数ファイルを選択してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>ZIPにファイルが入らない場合</h2>
+          <p>案件データファイルを読み込んだだけでは実ファイルはZIPに入りません。ZIPに含めたいファイルは、共有対象ファイルとして別途登録してください。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>share-index.html の見方</h2>
+          <p>共有内容の概要確認用HTMLです。案件名、共有メモ、件数、同梱ファイル一覧、ローカル共有であることを確認できます。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>クラウド共有ではないこと</h2>
+          <p>共有パッケージ作成はZIPをローカルで作る機能です。外部サーバーへのアップロード、URL発行、NAS連携はまだ行いません。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>問い合わせ・今後の改善</h2>
           <p>現段階では問い合わせフォームは未実装です。今後、ツール別ヘルプ、操作ガイド、FAQ、通知機能を追加予定です。</p>
         </article>
