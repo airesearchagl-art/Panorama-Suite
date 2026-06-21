@@ -522,7 +522,8 @@ function FloorMapBuilderPage() {
           <div className="sectionHeading">
             <div>
               <p className="sectionKicker">サンプル案件</p>
-              <h2>プレースホルダー平面図とピン</h2>
+              <h2>{sample.projectName}</h2>
+              <p>プレースホルダー平面図とピンで、実画像なしでも配置の流れを確認できます。</p>
             </div>
             <span className="statusBadge statusMvp">実画像なしのデモデータ</span>
           </div>

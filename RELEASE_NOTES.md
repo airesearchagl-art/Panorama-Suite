@@ -1,5 +1,12 @@
 # Release Notes
 
+## v1.9
+
+- v2.0公開前のリリース候補として、主要ルート、Tutorial、サンプル案件、Share Hub、Docs、Help、READMEの導線をQA。
+- サンプル案件からShare Hubの共有ZIPまで進む流れを再確認。
+- 公開前チェック、localStorageリセット案内、空状態・注意表示の文言を強化。
+- Vite buildで500kB超過警告が出ない状態を確認。
+
 ## v1.8
 
 - GitHub / Vercel公開向けにREADME、Docs、Help、Tutorial、画面内文言を整理。

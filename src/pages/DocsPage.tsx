@@ -89,7 +89,7 @@ function DocsPage() {
 
         <article className="infoPanel">
           <p className="sectionKicker">公開前チェック</p>
-          <h2>共有前に確認すること</h2>
+          <h2>v1.9 リリース候補チェック</h2>
           <ul className="docList">
             <li>トップページが開ける。</li>
             <li>チュートリアルに行ける。</li>
@@ -106,6 +106,17 @@ function DocsPage() {
             <li>buildが成功する。</li>
             <li>Viteの500kB超過警告が出ない。</li>
             <li>外部送信しないローカル共有であることを確認する。</li>
+          </ul>
+        </article>
+
+        <article className="infoPanel">
+          <p className="sectionKicker">Local Data</p>
+          <h2>初回表示とサンプル案件のリセット</h2>
+          <p>初回バナーの「あとで見る」とサンプル案件の読込状態は、ブラウザのlocalStorageに保存されます。</p>
+          <ul className="docList">
+            <li>`panorama-suite:tutorial-dismissed`: 初回バナーの非表示状態。</li>
+            <li>`panorama-suite:sample-project`: サンプル案件の読込状態。</li>
+            <li>再確認したい場合は、ブラウザの開発者ツールで上記キーを削除してください。</li>
           </ul>
         </article>
 

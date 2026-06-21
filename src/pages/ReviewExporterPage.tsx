@@ -548,7 +548,8 @@ function ReviewExporterPage() {
           <div className="sectionHeading">
             <div>
               <p className="sectionKicker">サンプル案件</p>
-              <h2>レビュー書き出しのイメージ</h2>
+              <h2>{sample.projectName}</h2>
+              <p>実画像なしのサンプルレビュー項目を使って、会議記録や指摘一覧の書き出しイメージを確認できます。</p>
             </div>
             <span className="statusBadge statusMvp">レビュー項目 {sample.reviewNotes.length} 件</span>
           </div>

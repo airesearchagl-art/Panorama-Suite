@@ -88,7 +88,7 @@ Panorama Suiteは、画像処理、品質チェック、ZIP作成、レビュー
 
 ## 公開情報
 
-- 現在のバージョン: v1.8
+- 現在のバージョン: v1.9
 - 公開URL: https://panorama-suite.vercel.app/
 - Portal: https://panorama-suite.vercel.app/
 - パノラマ品質チェック: https://panorama-suite.vercel.app/qa
@@ -135,6 +135,12 @@ Panorama Suiteは、画像処理、品質チェック、ZIP作成、レビュー
 - `npm run build` が成功する
 - Viteの500kB超過警告が出ない
 - 外部送信しないローカル処理の説明がある
+
+## v1.9 リリース候補
+
+v1.9は、v2.0公開前のリリース候補です。Tutorial、サンプル案件、主要ページ、Share Hub、Docs、Help、READMEの導線を実画面で確認し、外部ユーザーがサンプル案件から共有ZIP作成まで進める状態を目標にしています。
+
+localStorageをリセットしたい場合は、ブラウザの開発者ツールで `panorama-suite:tutorial-dismissed` と `panorama-suite:sample-project` を削除してください。通常利用では削除不要です。
 
 ## 用語方針
 

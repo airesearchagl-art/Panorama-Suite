@@ -372,7 +372,7 @@ function ShareHubPage() {
           <textarea
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="共有先、確認事項、提出目的などを入力できます。"
+            placeholder="共有先、確認事項、提出目的などを入力できます。未入力でもZIPは作れます。"
           />
         </label>
       </section>
@@ -411,9 +411,9 @@ function ShareHubPage() {
         {registeredFiles.length === 0 ? (
           <div className="emptyState">
             <span>📦</span>
-            <strong>共有対象ファイルがありません</strong>
-            <p>ファイルを追加して共有ZIPを作成してください。</p>
-          </div>
+          <strong>共有対象ファイルがありません</strong>
+          <p>実運用では共有したいファイルを追加してください。サンプル案件では実ファイル0件でもデモ用ZIPを作成できます。</p>
+        </div>
         ) : (
           <div className="resultTableWrap">
             <table className="resultTable">

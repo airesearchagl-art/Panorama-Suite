@@ -365,6 +365,11 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>初回バナーやサンプル案件をリセットする方法</h2>
+          <p>ブラウザのlocalStorageから `panorama-suite:tutorial-dismissed` と `panorama-suite:sample-project` を削除してください。通常利用では削除不要です。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>問い合わせ・今後の改善</h2>
           <p>現段階では問い合わせフォームは未実装です。今後、ツール別ヘルプ、操作ガイド、FAQ、通知機能を追加予定です。</p>
         </article>
