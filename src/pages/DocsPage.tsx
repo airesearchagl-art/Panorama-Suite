@@ -127,6 +127,17 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">ZIP出力前</p>
+          <h2>ZIP出力前チェックリスト</h2>
+          <ul className="docList">
+            <li>案件名、パノラマ画像、平面図画像、平面図ピン情報、QA結果を出力前に確認できます。</li>
+            <li>平面図ピン情報に記録された画像名と、登録済み平面図画像のファイル名が一致しているか確認します。</li>
+            <li>不足している平面図画像がある場合は、同じファイル名の画像を平面図画像として再登録してください。</li>
+            <li>注意項目があってもZIP出力は可能です。提出・共有前に内容を確認してください。</li>
+          </ul>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">直接連携</p>
           <h2>案件データを平面図ピン配置へ送る</h2>
           <ol className="docList">

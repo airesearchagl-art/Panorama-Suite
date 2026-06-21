@@ -1307,6 +1307,92 @@ h1 {
   line-height: 1.55;
 }
 
+.readinessChecklist {
+  grid-column: 1 / -1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: rgba(17, 24, 39, 0.32);
+  padding: 16px;
+}
+
+.readinessChecklist ul {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.readinessItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-panel);
+  padding: 10px;
+}
+
+.readinessItem strong,
+.readinessItem small,
+.readinessItem b {
+  display: block;
+}
+
+.readinessItem small {
+  margin-top: 3px;
+  color: var(--color-text-muted);
+}
+
+.readinessItem b {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+}
+
+.readinessOK b {
+  color: var(--color-success);
+}
+
+.readiness注意 b,
+.readiness未設定 b {
+  color: var(--color-warning);
+}
+
+.readiness不足 b {
+  color: var(--color-error);
+}
+
+.missingFileList {
+  margin-top: 14px;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  padding: 12px;
+}
+
+.missingFileList ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.missingFileList li {
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.82rem;
+}
+
+.missingFileList p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
 .qaSummaryInline dl {
   display: grid;
   grid-template-columns: 1fr 1fr;

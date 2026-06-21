@@ -93,6 +93,16 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>同名ファイル再登録とは何ですか？</h2>
+          <p>案件データに残っているファイル名と同じ名前の画像を、もう一度登録する操作です。同じファイル名で登録すると、平面図ピン情報と画像本体が紐づき、ZIPに含められます。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>注意項目が表示されてもZIP出力してよいですか？</h2>
+          <p>ZIP出力は可能です。ただし、画像本体が未登録の項目はZIPに含まれません。提出や共有に使う場合は、ZIP出力前チェックリストの内容を確認してください。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>基本機能版とは何ですか？</h2>
           <p>主要な業務に使える初期版です。細かな自動連携や高度な編集機能は今後追加予定です。</p>
         </article>

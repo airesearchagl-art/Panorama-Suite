@@ -109,6 +109,16 @@ type ProjectJson = {
   };
 };
 
+type ReadinessStatus = 'OK' | '注意' | '未設定' | '不足';
+
+type ReadinessItem = {
+  id: string;
+  label: string;
+  status: ReadinessStatus;
+  message: string;
+  detail?: string;
+};
+
 const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'webp']);
 const emptyQaSummary: QaSummary = { total: 0, ok: 0, warning: 0, error: 0 };
 const sceneTypeOptions = ['エントランス', '執務エリア', '会議室', '食堂', 'ラウンジ', '廊下', '階段', '外観', '現場', 'その他'];
@@ -289,6 +299,16 @@ function downloadBlob(blob: Blob, fileName: string) {
   URL.revokeObjectURL(url);
 }
 
+function getReadinessIcon(status: ReadinessStatus) {
+  if (status === 'OK') {
+    return '✅';
+  }
+  if (status === '不足') {
+    return '⛔';
+  }
+  return '⚠️';
+}
+
 function ProjectPackagerPage() {
   const { notify } = useToast();
   const navigate = useNavigate();
@@ -319,7 +339,84 @@ function ProjectPackagerPage() {
   const missingFloorMapImages = floorMaps.filter(
     (floorMap) => floorMap.imageFileName && !floorplans.some((floorplan) => floorplan.fileName === floorMap.imageFileName && floorplan.file),
   );
+  const missingFloorMapImageNames = useMemo(
+    () => [...new Set(missingFloorMapImages.map((floorMap) => floorMap.imageFileName).filter(Boolean))],
+    [missingFloorMapImages],
+  );
   const metadataComplete = panoramas.filter((panorama) => panorama.locationName.trim().length > 0).length;
+  const readinessItems = useMemo<ReadinessItem[]>(() => {
+    const unregisteredFiles = missingPanoramas.length + missingFloorplans.length;
+    const locationMissing = Math.max(0, panoramas.length - metadataComplete);
+    return [
+      {
+        id: 'project-name',
+        label: '案件名',
+        status: form.projectName.trim().length > 0 ? 'OK' : '注意',
+        message: form.projectName.trim().length > 0 ? '入力済み' : '案件名が未入力です',
+      },
+      {
+        id: 'panoramas',
+        label: 'パノラマ画像',
+        status: panoramas.length > 0 ? 'OK' : '不足',
+        message: panoramas.length > 0 ? `${panoramas.length}件登録済み` : '1枚以上登録してください',
+      },
+      {
+        id: 'floorplans',
+        label: '平面図画像',
+        status: floorplans.length > 0 ? 'OK' : '注意',
+        message: floorplans.length > 0 ? `${floorplans.length}件登録済み` : '未登録です',
+      },
+      {
+        id: 'floor-maps',
+        label: '平面図ピン情報',
+        status: floorMaps.length > 0 ? 'OK' : '注意',
+        message: floorMaps.length > 0 ? `${floorMaps.length}件あります` : '未作成です',
+      },
+      {
+        id: 'floor-map-images',
+        label: 'ピン情報に対応する平面図画像',
+        status: floorMaps.length === 0 ? '注意' : missingFloorMapImageNames.length === 0 ? 'OK' : '注意',
+        message: floorMaps.length === 0
+          ? '平面図ピン情報が未作成です'
+          : missingFloorMapImageNames.length === 0
+            ? '対応画像があります'
+            : '対応する画像が未登録です',
+        detail: missingFloorMapImageNames.length > 0 ? missingFloorMapImageNames.join('、') : undefined,
+      },
+      {
+        id: 'locations',
+        label: 'パノラマの場所名',
+        status: locationMissing === 0 ? 'OK' : '注意',
+        message: panoramas.length > 0 ? `${metadataComplete}件 / ${panoramas.length}件 入力済み` : 'パノラマ未登録です',
+        detail: locationMissing > 0 ? `${locationMissing}件が未入力です` : undefined,
+      },
+      {
+        id: 'qa',
+        label: 'QA結果',
+        status: qaSummary.total === 0 ? '注意' : qaSummary.error > 0 ? '不足' : 'OK',
+        message: qaSummary.total === 0 ? 'QA結果が未読み込みです' : qaSummary.error > 0 ? `Error ${qaSummary.error}件` : 'Errorなし',
+      },
+      {
+        id: 'real-files',
+        label: '実ファイル未登録',
+        status: unregisteredFiles === 0 ? 'OK' : '注意',
+        message: unregisteredFiles === 0 ? '未登録項目なし' : `${unregisteredFiles}件あります`,
+      },
+    ];
+  }, [
+    floorMaps.length,
+    floorplans.length,
+    form.projectName,
+    metadataComplete,
+    missingFloorMapImageNames,
+    missingFloorplans.length,
+    missingPanoramas.length,
+    panoramas.length,
+    qaSummary.error,
+    qaSummary.total,
+  ]);
+  const readinessWarningCount = readinessItems.filter((item) => item.status !== 'OK').length;
+  const isPackageReady = readinessItems.every((item) => item.status !== '不足');
   const sortedPanoramas = useMemo(
     () => [...panoramas].sort((a, b) => a.sortOrder - b.sortOrder || a.fileName.localeCompare(b.fileName)),
     [panoramas],
@@ -500,6 +597,13 @@ function ProjectPackagerPage() {
     const files = Array.from(fileList);
     const validFiles = files.filter((file) => imageExtensions.has(getExtension(file.name)));
     const invalidFiles = files.filter((file) => !imageExtensions.has(getExtension(file.name)));
+    const linkedFloorMapFileNames = [
+      ...new Set(
+        validFiles
+          .map((file) => file.name)
+          .filter((fileName) => floorMaps.some((floorMap) => floorMap.imageFileName === fileName)),
+      ),
+    ];
 
     setFloorplans((current) => {
       const next = [...current];
@@ -528,6 +632,11 @@ function ProjectPackagerPage() {
     setMessages(invalidFiles.map((file) => `${file.name}: 非対応形式です。jpg、jpeg、png、webp を使用してください。`));
     if (validFiles.length > 0) {
       notify('平面図を登録しました', 'success');
+    }
+    if (linkedFloorMapFileNames.length === 1) {
+      notify(`${linkedFloorMapFileNames[0]} を平面図ピン情報に紐づけました`, 'success');
+    } else if (linkedFloorMapFileNames.length > 1) {
+      notify(`${linkedFloorMapFileNames.length}件の平面図画像を平面図ピン情報に紐づけました`, 'success');
     }
     if (invalidFiles.length > 0) {
       notify('非対応形式のファイルを除外しました', 'warning');
@@ -666,6 +775,10 @@ function ProjectPackagerPage() {
       return;
     }
 
+    if (readinessWarningCount > 0) {
+      notify('ZIP出力前チェックを確認してください', 'info');
+    }
+
     setIsPackaging(true);
     const warnings = [
       ...(panoramas.length === 0 ? ['パノラマ画像が0枚です。空のpanoramasフォルダを含めて出力します。'] : []),
@@ -710,12 +823,8 @@ function ProjectPackagerPage() {
     downloadBlob(blob, `${safeProjectName || 'panorama-project'}.zip`);
     setMessages(warnings.length > 0 ? warnings : ['ZIPを書き出しました。']);
     setIsPackaging(false);
-    if (floorMaps.length === 0) {
-      notify('平面図ピン情報は空の状態でZIPを書き出しました', 'info');
-    } else if (missingFloorMapImages.length > 0) {
-      notify('平面図ピン情報に不足している平面図画像があります', 'warning');
-    } else if (warnings.length > 0) {
-      notify('未再登録ファイルがあります。ZIPには実ファイルは含まれません', 'warning');
+    if (readinessWarningCount > 0) {
+      notify('注意項目がありますがZIPを書き出しました', 'warning');
     } else {
       notify('平面図ピン情報を含めてZIPを書き出しました', 'success');
     }
@@ -772,6 +881,8 @@ function ProjectPackagerPage() {
         <article className="metricCard successMetric"><span>場所名入力済み</span><strong>{metadataComplete}/{panoramas.length}</strong></article>
         <article className="metricCard"><span>平面図ピン情報</span><strong>{floorMaps.length}</strong></article>
         <article className="metricCard"><span>ピン</span><strong>{floorMapPinCount}</strong></article>
+        <article className={isPackageReady ? 'metricCard successMetric' : 'metricCard warningMetric'}><span>Ready</span><strong>{isPackageReady ? 'OK' : '不足'}</strong></article>
+        <article className={readinessWarningCount > 0 ? 'metricCard warningMetric' : 'metricCard successMetric'}><span>Warnings</span><strong>{readinessWarningCount}</strong></article>
       </section>
 
       <section className="importPanel" aria-labelledby="import-title">
@@ -1099,13 +1210,13 @@ function ProjectPackagerPage() {
                           </td>
                           <td>{floorMap.level || '-'}</td>
                           <td>{floorMap.imageFileName || '-'}</td>
-                          <td>{floorMap.pins.length}</td>
-                          <td>
-                            <span className={hasRealFile ? 'fileStateReady' : 'fileStateMissing'}>
-                              {hasRealFile ? '実ファイル登録済み' : '実ファイル未登録'}
-                            </span>
-                          </td>
-                        </tr>
+                        <td>{floorMap.pins.length}</td>
+                        <td>
+                          <span className={hasRealFile ? 'fileStateReady' : 'fileStateMissing'}>
+                            {hasRealFile ? '紐づき完了' : '実ファイル未登録'}
+                          </span>
+                        </td>
+                      </tr>
                       );
                     })
                   )}
@@ -1136,6 +1247,33 @@ function ProjectPackagerPage() {
                 <div><dt>Warning</dt><dd>{qaSummary.warning}</dd></div>
                 <div><dt>Error</dt><dd>{qaSummary.error}</dd></div>
               </dl>
+            </div>
+            <div className="readinessChecklist">
+              <div className="panelHeader">
+                <h2>ZIP出力前チェックリスト</h2>
+                <span>{readinessWarningCount > 0 ? `注意 ${readinessWarningCount}件` : '出力準備OK'}</span>
+              </div>
+              <ul>
+                {readinessItems.map((item) => (
+                  <li className={`readinessItem readiness${item.status}`} key={item.id}>
+                    <span aria-hidden="true">{getReadinessIcon(item.status)}</span>
+                    <div>
+                      <strong>{item.label}: {item.message}</strong>
+                      {item.detail ? <small>{item.detail}</small> : null}
+                    </div>
+                    <b>{item.status}</b>
+                  </li>
+                ))}
+              </ul>
+              {missingFloorMapImageNames.length > 0 ? (
+                <div className="missingFileList">
+                  <strong>不足している平面図画像</strong>
+                  <ul>
+                    {missingFloorMapImageNames.map((fileName) => <li key={fileName}>{fileName}</li>)}
+                  </ul>
+                  <p>同じファイル名の画像を平面図画像として登録すると、ZIPに含められます。</p>
+                </div>
+              ) : null}
             </div>
           </section>
         </div>
