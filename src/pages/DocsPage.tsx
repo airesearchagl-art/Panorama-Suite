@@ -114,6 +114,17 @@ function DocsPage() {
         </article>
 
         <article className="infoPanel">
+          <p className="sectionKicker">ピン位置調整</p>
+          <h2>ピンをドラッグして移動する</h2>
+          <ul className="docList">
+            <li>配置済みのピンを押したまま動かすと、平面図上で位置を調整できます。</li>
+            <li>ピン位置は画像内の x / y % 座標として保存されます。</li>
+            <li>x / y の数値入力でも位置を調整できます。</li>
+            <li>ドラッグ後の位置は floor-map.json と updated-project.json に反映されます。</li>
+          </ul>
+        </article>
+
+        <article className="infoPanel">
           <p className="sectionKicker">Packager v0.3</p>
           <h2>平面図ピン情報をZIPに同梱する</h2>
           <ol className="docList">

@@ -63,8 +63,18 @@ function HelpPage() {
         </article>
 
         <article className="infoPanel">
+          <h2>ピンをドラッグできない場合</h2>
+          <p>平面図画像が読み込まれているか確認してください。ピンの丸い部分を押したまま動かすと移動できます。空白部分をクリックすると新しいピンが追加されます。</p>
+        </article>
+
+        <article className="infoPanel">
           <h2>x / y %座標とは何か</h2>
           <p>xは左端から右方向、yは上端から下方向の割合です。左上が 0 / 0、右下が 100 / 100 です。</p>
+        </article>
+
+        <article className="infoPanel">
+          <h2>タッチ操作時の注意</h2>
+          <p>Pointer Events に対応しているためタッチ操作でも移動できますが、端末やブラウザによってはスクロール操作と干渉する場合があります。細かな調整は x / y 数値入力を使ってください。</p>
         </article>
 
         <article className="infoPanel">

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppFrame from '../components/AppFrame';
 import { useToast } from '../components/ToastProvider';
@@ -72,6 +72,12 @@ type RawProject = {
   floorMaps?: Array<Partial<FloorMap>>;
   createdAt?: string;
   source?: string;
+};
+
+type DragState = {
+  pinId: string;
+  moved: boolean;
+  outsideNotified: boolean;
 };
 
 const imageExtensions = new Set(['jpg', 'jpeg', 'png', 'webp']);
@@ -173,10 +179,13 @@ function FloorMapBuilderPage() {
   const { notify } = useToast();
   const navigate = useNavigate();
   const handoffLoadedRef = useRef(false);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
   const [sourceProject, setSourceProject] = useState<SourceProject | null>(null);
   const [floorMap, setFloorMap] = useState<UploadedFloorMap | null>(null);
   const [pins, setPins] = useState<FloorMapPin[]>([]);
   const [selectedPanoramaId, setSelectedPanoramaId] = useState('');
+  const [selectedPinId, setSelectedPinId] = useState('');
+  const [dragState, setDragState] = useState<DragState | null>(null);
   const [messages, setMessages] = useState<string[]>([]);
   const [handoffMessage, setHandoffMessage] = useState('');
 
@@ -189,6 +198,7 @@ function FloorMapBuilderPage() {
   const handoffSourceLabel = sourceProject?.handoffSource === 'packager' ? '案件パッケージ作成' : sourceProject?.handoffSource ?? '';
 
   const selectedPanorama = panoramas.find((panorama) => panorama.id === selectedPanoramaId);
+  const selectedPin = pins.find((pin) => pin.id === selectedPinId);
   const activeFloorMaps = useMemo<FloorMap[]>(() => {
     const restoredMaps = sourceProject?.floorMaps ?? [];
     const currentMap = floorMap
@@ -208,6 +218,71 @@ function FloorMapBuilderPage() {
 
     return [currentMap, ...restoredMaps.filter((map) => map.id !== currentMap.id)];
   }, [floorMap, pins, sourceProject?.floorMaps]);
+
+  const getCanvasPercent = (clientX: number, clientY: number) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect || rect.width === 0 || rect.height === 0) {
+      return null;
+    }
+
+    const rawX = ((clientX - rect.left) / rect.width) * 100;
+    const rawY = ((clientY - rect.top) / rect.height) * 100;
+    return {
+      x: clampPercent(rawX),
+      y: clampPercent(rawY),
+      isOutside: rawX < 0 || rawX > 100 || rawY < 0 || rawY > 100,
+    };
+  };
+
+  useEffect(() => {
+    if (!dragState) {
+      return undefined;
+    }
+
+    const handlePointerMove = (event: globalThis.PointerEvent) => {
+      const position = getCanvasPercent(event.clientX, event.clientY);
+      if (!position) {
+        return;
+      }
+
+      event.preventDefault();
+      setPins((current) =>
+        current.map((pin) => (pin.id === dragState.pinId ? { ...pin, x: position.x, y: position.y } : pin)),
+      );
+      setDragState((current) => {
+        if (!current || current.pinId !== dragState.pinId) {
+          return current;
+        }
+        if (position.isOutside && !current.outsideNotified) {
+          notify('平面図の範囲外には移動できません', 'warning');
+        }
+        return {
+          ...current,
+          moved: true,
+          outsideNotified: current.outsideNotified || position.isOutside,
+        };
+      });
+    };
+
+    const handlePointerUp = () => {
+      setDragState((current) => {
+        if (current?.moved) {
+          notify('ピンを移動しました', 'success');
+        }
+        return null;
+      });
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+  }, [dragState, notify]);
 
   useEffect(() => {
     if (handoffLoadedRef.current) {
@@ -298,6 +373,7 @@ function FloorMapBuilderPage() {
       note: '',
     };
     setPins((current) => [...current, nextPin]);
+    setSelectedPinId(nextPin.id);
     notify('ピンを追加しました', 'success');
   };
 
@@ -310,12 +386,33 @@ function FloorMapBuilderPage() {
     addPinAt(((event.clientX - rect.left) / rect.width) * 100, ((event.clientY - rect.top) / rect.height) * 100);
   };
 
+  const selectPin = (pinId: string, shouldNotify = true) => {
+    setSelectedPinId(pinId);
+    const pin = pins.find((item) => item.id === pinId);
+    if (pin?.panoramaId) {
+      setSelectedPanoramaId(pin.panoramaId);
+    }
+    if (shouldNotify) {
+      notify('ピンを選択しました', 'info');
+    }
+  };
+
+  const startPinDrag = (event: PointerEvent<HTMLButtonElement>, pinId: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+    selectPin(pinId);
+    setDragState({ pinId, moved: false, outsideNotified: false });
+  };
+
   const updatePin = <Key extends keyof FloorMapPin>(id: string, key: Key, value: FloorMapPin[Key]) => {
     setPins((current) => current.map((pin) => (pin.id === id ? { ...pin, [key]: value } : pin)));
   };
 
   const deletePin = (id: string) => {
     setPins((current) => current.filter((pin) => pin.id !== id));
+    if (selectedPinId === id) {
+      setSelectedPinId('');
+    }
     notify('ピンを削除しました', 'success');
   };
 
@@ -489,18 +586,20 @@ function FloorMapBuilderPage() {
                 </label>
                 <strong>{floorMap.fileName}</strong>
               </div>
-              <div className="floorMapCanvas" onClick={handleCanvasClick} role="button" tabIndex={0}>
+              <div className="floorMapCanvas" ref={canvasRef} onClick={handleCanvasClick} role="button" tabIndex={0}>
                 <img src={floorMap.previewUrl} alt={floorMap.name} />
                 {pins.map((pin, index) => (
                   <button
                     type="button"
-                    className="floorMapPin"
+                    className={`floorMapPin ${selectedPinId === pin.id ? 'selectedFloorMapPin' : ''} ${dragState?.pinId === pin.id ? 'draggingFloorMapPin' : ''}`}
                     key={pin.id}
                     style={{ left: `${pin.x}%`, top: `${pin.y}%`, ['--pin-direction' as string]: `${pin.direction}deg` }}
                     title={`${pin.label} / ${pin.direction}°`}
+                    onPointerDown={(event) => startPinDrag(event, pin.id)}
                     onClick={(event) => event.stopPropagation()}
                   >
                     <span>{index + 1}</span>
+                    {selectedPinId === pin.id ? <small>選択中</small> : null}
                   </button>
                 ))}
               </div>
@@ -554,7 +653,10 @@ function FloorMapBuilderPage() {
           </section>
 
           <section>
-            <h2>ピン一覧</h2>
+            <div className="panelHeader">
+              <h2>ピン一覧</h2>
+              {selectedPin ? <span className="selectedPinBadge">選択中: {selectedPin.label || selectedPin.id}</span> : null}
+            </div>
             {duplicateAssignments.length > 0 ? (
               <div className="missingNotice">
                 <strong>同じパノラマが複数ピンに割り当てられています。</strong>
@@ -570,18 +672,32 @@ function FloorMapBuilderPage() {
             ) : (
               <div className="pinEditorList">
                 {pins.map((pin) => (
-                  <article className="pinEditorCard" key={pin.id}>
+                  <article
+                    className={`pinEditorCard ${selectedPinId === pin.id ? 'selectedPinEditorCard' : ''}`}
+                    key={pin.id}
+                    onClick={() => selectPin(pin.id)}
+                  >
                     <div className="panelHeader">
                       <strong>{pin.label || pin.id}</strong>
-                      <button type="button" className="tableButton" onClick={() => deletePin(pin.id)}>削除</button>
+                      {selectedPinId === pin.id ? <span className="selectedPinBadge">選択中</span> : null}
+                      <button
+                        type="button"
+                        className="tableButton"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          deletePin(pin.id);
+                        }}
+                      >
+                        削除
+                      </button>
                     </div>
                     <label>
                       <span>label</span>
-                      <input value={pin.label} onChange={(event) => updatePin(pin.id, 'label', event.target.value)} />
+                      <input value={pin.label} onClick={(event) => event.stopPropagation()} onChange={(event) => updatePin(pin.id, 'label', event.target.value)} />
                     </label>
                     <label>
                       <span>panoramaId</span>
-                      <select value={pin.panoramaId} onChange={(event) => updatePin(pin.id, 'panoramaId', event.target.value)}>
+                      <select value={pin.panoramaId} onClick={(event) => event.stopPropagation()} onChange={(event) => updatePin(pin.id, 'panoramaId', event.target.value)}>
                         <option value="">未割当</option>
                         {panoramas.map((panorama) => (
                           <option value={panorama.id} key={panorama.id}>
@@ -593,20 +709,20 @@ function FloorMapBuilderPage() {
                     <div className="pinCoordinateGrid">
                       <label>
                         <span>x %</span>
-                        <input type="number" min="0" max="100" value={pin.x} onChange={(event) => updatePin(pin.id, 'x', clampPercent(Number(event.target.value)))} />
+                        <input type="number" min="0" max="100" value={pin.x} onClick={(event) => event.stopPropagation()} onChange={(event) => updatePin(pin.id, 'x', clampPercent(Number(event.target.value)))} />
                       </label>
                       <label>
                         <span>y %</span>
-                        <input type="number" min="0" max="100" value={pin.y} onChange={(event) => updatePin(pin.id, 'y', clampPercent(Number(event.target.value)))} />
+                        <input type="number" min="0" max="100" value={pin.y} onClick={(event) => event.stopPropagation()} onChange={(event) => updatePin(pin.id, 'y', clampPercent(Number(event.target.value)))} />
                       </label>
                       <label>
                         <span>direction °</span>
-                        <input type="number" min="0" max="359" value={pin.direction} onChange={(event) => updatePin(pin.id, 'direction', normalizeDirection(Number(event.target.value)))} />
+                        <input type="number" min="0" max="359" value={pin.direction} onClick={(event) => event.stopPropagation()} onChange={(event) => updatePin(pin.id, 'direction', normalizeDirection(Number(event.target.value)))} />
                       </label>
                     </div>
                     <label>
                       <span>note</span>
-                      <input value={pin.note} onChange={(event) => updatePin(pin.id, 'note', event.target.value)} />
+                      <input value={pin.note} onClick={(event) => event.stopPropagation()} onChange={(event) => updatePin(pin.id, 'note', event.target.value)} />
                     </label>
                   </article>
                 ))}
